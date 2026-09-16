@@ -12,3 +12,4 @@ node_modules/
 
 # Systeme
 .DS_Store
+*:Zone.Identifier
