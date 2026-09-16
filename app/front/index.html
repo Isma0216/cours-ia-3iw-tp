@@ -1,264 +1,1208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Assistant support : application fil rouge</title>
-<style>
-  :root {
-    --navy: #16284D; --accent: #0EA5E9; --ink: #1F2A37; --gray: #5B6679;
-    --border: #D7DEEA; --soft: #F4F7FC; --card: #EAF1FB; --rouge: #C0504D;
-    --vert: #3FA45B;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Châtillon Boxing Club — ACSC92 | Muay Thaï, Kick-boxing, MMA, Cardio Boxing</title>
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+<meta name="description" content="Châtillon Boxing Club (ACSC92) — association loi 1901 fondée en 1981. Muay Thaï, Kick-boxing, MMA (adultes & enfants), Cardio Boxing, Kids/Ados et Cross Training Boxe à Châtillon (92). Inscriptions en ligne.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- ===== Assistant IA (chatbot) : styles ===== -->
+<style id="cbc-styles">
+  .cbc-chat{position:fixed;right:20px;bottom:20px;z-index:200;font-family:var(--body)}
+  /* Bouton flottant */
+  .cbc-toggle{width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--red);color:#fff;display:grid;place-items:center;
+    box-shadow:0 10px 30px rgba(224,32,45,.45);transition:transform .15s ease,background .2s ease}
+  .cbc-toggle:hover{background:var(--red-bright);transform:translateY(-2px)}
+  .cbc-toggle:focus-visible{outline:3px solid var(--blue-bright);outline-offset:3px}
+  .cbc-toggle svg{width:28px;height:28px}
+  .cbc-toggle .cbc-x{display:none}
+  .cbc-chat.open .cbc-toggle .cbc-bubble{display:none}
+  .cbc-chat.open .cbc-toggle .cbc-x{display:block}
+  /* Panneau */
+  .cbc-panel{position:absolute;right:0;bottom:74px;width:min(380px,92vw);height:min(560px,72vh);
+    display:flex;flex-direction:column;overflow:hidden;
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);animation:cbcUp .18s ease}
+  @keyframes cbcUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .cbc-panel[hidden]{display:none}
+  /* En-tete */
+  .cbc-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+    padding:14px 16px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .cbc-head-id{display:flex;align-items:center;gap:.7rem}
+  .cbc-head strong{font-family:var(--display);font-weight:400;letter-spacing:.02em;font-size:1.05rem;text-transform:uppercase}
+  .cbc-head small{display:block;color:var(--muted);font-size:.72rem;line-height:1.3}
+  .cbc-dot{width:9px;height:9px;border-radius:50%;background:#3FA45B;flex:0 0 auto;
+    box-shadow:0 0 0 3px rgba(63,164,91,.18)}
+  .cbc-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;line-height:1;padding:4px}
+  .cbc-close:hover{color:var(--text)}
+  /* Journal des messages */
+  .cbc-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .cbc-msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:.92rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+  .cbc-msg.bot{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .cbc-msg.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+  .cbc-msg.err{align-self:flex-start;background:#2a1416;border:1px solid var(--red);color:#ffb4b4}
+  .cbc-msg .cbc-cursor::after{content:"▌";color:var(--red-bright);animation:cbcBlink 1s steps(2) infinite}
+  @keyframes cbcBlink{50%{opacity:0}}
+  /* Suggestions */
+  .cbc-suggests{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+  .cbc-suggests button{font-family:var(--util);text-transform:uppercase;letter-spacing:.04em;
+    font-size:.7rem;font-weight:600;color:var(--muted);background:transparent;
+    border:1px solid var(--line);border-radius:20px;padding:6px 11px;cursor:pointer;transition:.15s}
+  .cbc-suggests button:hover{border-color:var(--blue-bright);color:var(--text)}
+  /* Saisie */
+  .cbc-input{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--surface-2)}
+  .cbc-input input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);font:inherit;font-size:.9rem;padding:10px 12px}
+  .cbc-input input:focus{outline:none;border-color:var(--blue-bright)}
+  .cbc-input button{width:42px;flex:0 0 auto;border:none;border-radius:10px;background:var(--red);
+    color:#fff;font-size:1.05rem;cursor:pointer;transition:background .2s}
+  .cbc-input button:hover:not(:disabled){background:var(--red-bright)}
+  .cbc-input button:disabled{background:var(--line);cursor:not-allowed}
+  @media(max-width:480px){
+    .cbc-chat{right:14px;bottom:14px}
+    .cbc-panel{bottom:70px;height:74vh}
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; font: 15px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: var(--ink); background: var(--soft);
-  }
-  header {
-    background: var(--navy); color: #fff; padding: 18px 24px;
-    border-bottom: 4px solid var(--accent);
-  }
-  header h1 { margin: 0; font: 600 19px/1.3 Georgia, serif; }
-  header p { margin: 4px 0 0; font-size: 13px; color: #9FC5E8; }
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
-  nav { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-  nav button {
-    border: 1px solid var(--border); background: #fff; color: var(--gray);
-    padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;
-  }
-  nav button[aria-selected="true"] {
-    background: var(--navy); color: #fff; border-color: var(--navy);
-  }
-  section[hidden] { display: none; }
-  .panneau {
-    background: #fff; border: 1px solid var(--border); border-radius: 10px;
-    padding: 20px;
-  }
-  label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; }
-  textarea, input[type=text], select {
-    width: 100%; padding: 10px; border: 1px solid var(--border);
-    border-radius: 6px; font: inherit; background: #fff;
-  }
-  textarea { min-height: 130px; resize: vertical; }
-  .ligne { display: flex; gap: 12px; align-items: flex-end; margin-top: 14px; }
-  .ligne > div { flex: 0 0 180px; }
-  button.envoyer {
-    background: var(--accent); color: #fff; border: 0; padding: 11px 22px;
-    border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
-    margin-left: auto;
-  }
-  button.envoyer:disabled { background: var(--gray); cursor: not-allowed; }
-  .sortie {
-    margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px;
-    min-height: 60px; white-space: pre-wrap;
-  }
-  .attente { color: var(--gray); font-style: italic; }
-  .curseur::after {
-    content: "▌"; color: var(--accent); animation: clignote 1s steps(2) infinite;
-  }
-  @keyframes clignote { 50% { opacity: 0; } }
-  .erreur {
-    background: #FDECEA; border: 1px solid var(--rouge); color: #7A2E2C;
-    padding: 12px 14px; border-radius: 6px; font-size: 14px;
-  }
-  .usage {
-    margin-top: 14px; font-size: 12.5px; color: var(--gray);
-    display: flex; gap: 18px; flex-wrap: wrap;
-  }
-  .usage b { color: var(--navy); }
-  .sources { margin-top: 14px; }
-  .sources h3 { font-size: 12px; text-transform: uppercase; color: var(--accent);
-                letter-spacing: .04em; margin: 0 0 8px; }
-  .source {
-    display: inline-block; background: var(--card); border: 1px solid var(--border);
-    border-radius: 20px; padding: 4px 12px; font-size: 12.5px; margin: 0 6px 6px 0;
-  }
-  .source span { color: var(--gray); }
-  footer { text-align: center; font-size: 12px; color: var(--gray); padding: 0 16px 30px; }
-  code { background: var(--card); padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>Assistant support</h1>
-  <p>Application fil rouge : ce front est fourni et gelé. Vous écrivez le serveur.</p>
+  <div class="wrap nav">
+    <a href="#top" class="brand">
+      <img class="brand-logo" src="img/logo-acsc92.png" alt="Logo Châtillon Boxing Club — ACSC92">
+      <span>CHÂTILLON BC<small>ACSC92 · depuis 1981</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#disciplines">Disciplines</a>
+      <a href="#fiches">Offres</a>
+      <a href="#planning">Planning</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#coachs">Coachs</a>
+      <a href="#club">Le club</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://tally.so/r/vG6oAQ" class="btn btn-primary" target="_blank" rel="noopener">S'inscrire</a>
+      <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobilePanel">☰</button>
+    </div>
+  </div>
+  <div class="mobile-panel" id="mobilePanel">
+    <div class="wrap">
+      <nav>
+        <a href="#disciplines">Disciplines</a>
+        <a href="#fiches">Offres</a>
+        <a href="#planning">Planning</a>
+        <a href="#tarifs">Tarifs & formules</a>
+        <a href="#coachs">Coachs</a>
+        <a href="#club">Le club</a>
+        <a href="#contact">Contact</a>
+        <a href="https://tally.so/r/vG6oAQ" target="_blank" rel="noopener">S'inscrire en ligne</a>
+      </nav>
+    </div>
+  </div>
 </header>
 
-<main>
-  <nav role="tablist">
-    <button role="tab" data-onglet="resumer" aria-selected="true">Résumer &middot; S9</button>
-    <button role="tab" data-onglet="assistant" aria-selected="false">Assistant &middot; S10</button>
-    <button role="tab" data-onglet="documents" aria-selected="false">Documents &middot; S13</button>
-  </nav>
+<main id="top">
 
-  <section id="panneau-resumer" class="panneau">
-    <label for="texte">Texte du ticket à résumer</label>
-    <textarea id="texte" placeholder="Collez ici le message d'un client."></textarea>
-    <div class="ligne">
-      <div>
-        <label for="ton">Ton du résumé</label>
-        <select id="ton">
-          <option value="neutre">neutre</option>
-          <option value="direct">direct</option>
-        </select>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="glow blue" aria-hidden="true"></div>
+    <div class="glow red" aria-hidden="true"></div>
+    <span class="corner-tag left"><span></span>Coin bleu</span>
+    <span class="corner-tag right"><span></span>Coin rouge</span>
+    <div class="wrap">
+      <span class="eyebrow">Association loi 1901 · Châtillon (92)</span>
+      <h1>Châtillon<br><span class="hl-blue">Boxing</span> Club</h1>
+      <p class="disc-line">Muay Thaï · Kick-boxing · MMA · <span class="hl-pink">Cardio Boxing</span> · <b>Kids &amp; Ados</b> · <span class="hl-white">Coaching mental</span></p>
+      <p class="lead">La boxe pieds-poings à Châtillon depuis 1981, du débutant au compétiteur et boxe loisirs. Une vraie école de boxe où la technique, le dépassement de soi et le respect s'imposent, dans des cours dispensés par des coachs diplômés.</p>
+      <div class="hero-actions">
+        <a href="https://tally.so/r/vG6oAQ" class="btn btn-primary" target="_blank" rel="noopener">S'inscrire en ligne</a>
+        <a href="#planning" class="btn btn-ghost">Voir le planning</a>
       </div>
-      <button class="envoyer" data-route="/api/resumer">Résumer</button>
+      <div class="stats">
+        <div class="stat"><div class="num">+<em>200</em></div><div class="lbl">Membres</div></div>
+        <div class="stat"><div class="num">Depuis <em>1981</em></div><div class="lbl">Association loi 1901</div></div>
+        <div class="stat"><div class="num"><em>6</em></div><div class="lbl">Disciplines + cross training</div></div>
+        <div class="stat"><div class="num">Tous <em>niveaux</em></div><div class="lbl">Du débutant au compétiteur</div></div>
+      </div>
     </div>
-    <div class="sortie" id="sortie-resumer"></div>
-    <div class="usage" id="usage-resumer"></div>
   </section>
 
-  <section id="panneau-assistant" class="panneau" hidden>
-    <label for="question-assistant">Question sur une commande</label>
-    <input type="text" id="question-assistant"
-           placeholder="Où en est la commande CMD-2024-118 ?">
-    <div class="ligne">
-      <button class="envoyer" data-route="/api/assistant">Demander</button>
+  <div class="ropes" aria-hidden="true"></div>
+
+  <!-- DISCIPLINES (cartes) -->
+  <section id="disciplines">
+    <div class="wrap">
+      <span class="eyebrow">Ce qu'on propose</span>
+      <h2 class="section-title">Nos disciplines</h2>
+      <p class="section-intro">Six disciplines encadrées par des coachs diplômés, une session de cross training boxe réservée aux adhérents et du coaching mental pour tous, du débutant au compétiteur. Chaque créneau est ouvert aux débutants.</p>
+      <div class="grid-disc">
+
+        <article class="card" style="--corner:var(--red)">
+          <span class="ctag">Coin rouge</span>
+          <h3>Muay Thaï</h3>
+          <p class="desc">« L'art des huit membres » : poings, pieds, coudes et genoux. Puissance, vitesse, résistance et maîtrise de soi.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span>Mar &amp; Jeu · 20h15 – 21h45</span></div>
+            <div><span class="k">Public</span><span>Adultes</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">320 € / an · 270 € étudiant</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--blue)">
+          <span class="ctag">Coin bleu</span>
+          <h3>Kick-boxing</h3>
+          <p class="desc">Sport pieds-poings mêlant boxe anglaise et coups de pied. Endurance, force, agilité et un vrai exutoire au stress.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span>Lun &amp; Mer · 19h30 – 21h</span></div>
+            <div><span class="k">Public</span><span>Adultes</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">320 € / an · 270 € étudiant</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--red)">
+          <span class="ctag">Coin rouge</span>
+          <h3>MMA</h3>
+          <p class="desc">Percussion (pied, poing, genou, coude) et préhension (projections, soumissions, sol). La discipline la plus complète.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span><span class="slot">Lun · 18h30 – 19h30</span><span class="slot">Mar &amp; Jeu · 19h15 – 20h15</span><span class="slot">Ven · 19h15 – 20h15</span></span></div>
+            <div><span class="k">Public</span><span>Adultes</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">380 € / an · 330 € étudiant</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--pink)">
+          <span class="ctag">Coin rose</span>
+          <h3>Cardio Boxing</h3>
+          <p class="desc">Le kick-boxing en version tonique et bienveillante : techniques de boxe, cardio, coordination, renforcement et confiance en soi.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span>Samedi · 10h15 – 12h15</span></div>
+            <div><span class="k">Public</span><span>Tous niveaux</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">230 € / an</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--red)">
+          <span class="ctag">Coin rouge</span>
+          <h3>Kids / Ados</h3>
+          <p class="desc">De 8 à 17 ans : toutes les boxes pieds-poings et initiation à la boxe anglaise, dans un cadre sécurisé et motivant.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span><span class="slot">Mer · 17h30 – 18h45 (8 ans+)</span><span class="slot">Ven · 18h – 19h (12 ans+)</span></span></div>
+            <div><span class="k">Public</span><span>Enfants &amp; ados · 8–17 ans</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">Kids 200 € · Ados 230 € / an</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--blue)">
+          <span class="ctag">Coin bleu</span>
+          <h3>MMA Enfant</h3>
+          <p class="desc">L'initiation au MMA pour les 8–15 ans : percussion et préhension encadrées, en toute sécurité et de façon ludique.</p>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span>Mar &amp; Jeu · 18h – 19h</span></div>
+            <div><span class="k">Public</span><span>Enfants &amp; ados · 8–15 ans</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">270 € / an</span></div>
+          </div>
+        </article>
+
+        <article class="card" style="--corner:var(--red)">
+          <span class="ctag">Coin rouge</span>
+          <h3>Cross Training Boxe</h3>
+          <p class="desc">Circuits de cross training adaptés à la boxe pieds-poings. Cardio, mobilité et renforcement pour compléter la technique.</p>
+          <span class="tag-pill">Réservé aux adhérents · places limitées</span>
+          <div class="meta">
+            <div><span class="k">Horaires</span><span>Samedi · 12h30 – 14h</span></div>
+            <div><span class="k">Public</span><span>Adhérents du club</span></div>
+            <div><span class="k">Tarif</span><span class="tarif">À voir avec le secrétariat</span></div>
+          </div>
+        </article>
+
+      </div>
     </div>
-    <div class="sortie" id="sortie-assistant"></div>
-    <div class="usage" id="usage-assistant"></div>
   </section>
 
-  <section id="panneau-documents" class="panneau" hidden>
-    <label for="question-documents">Question sur la documentation</label>
-    <input type="text" id="question-documents"
-           placeholder="Comment demander un remboursement ?">
-    <div class="ligne">
-      <button class="envoyer" data-route="/api/documents">Chercher</button>
+  <!-- PLANNING -->
+  <section id="planning" class="planning">
+    <div class="wrap">
+      <span class="eyebrow blue">L'info la plus consultée</span>
+      <h2 class="section-title">Le planning de la semaine</h2>
+      <p class="section-intro">Tous les créneaux réunis en un coup d'œil. Choisis ton créneau et viens pousser la porte de la salle.</p>
+      <div class="week">
+        <div class="day">
+          <h4>Lundi</h4>
+          <div class="sess r"><div class="t">18h30 – 19h30</div><div class="d">MMA</div></div>
+          <div class="sess b"><div class="t">19h30 – 21h</div><div class="d">Kick-boxing</div></div>
+        </div>
+        <div class="day">
+          <h4>Mardi</h4>
+          <div class="sess b"><div class="t">18h – 19h</div><div class="d">MMA Enfant (8–15)</div></div>
+          <div class="sess r"><div class="t">19h15 – 20h15</div><div class="d">MMA</div></div>
+          <div class="sess r"><div class="t">20h15 – 21h45</div><div class="d">Muay Thaï</div></div>
+        </div>
+        <div class="day">
+          <h4>Mercredi</h4>
+          <div class="sess r"><div class="t">17h30 – 18h45</div><div class="d">Kids / Ados (8+)</div></div>
+          <div class="sess b"><div class="t">19h30 – 21h</div><div class="d">Kick-boxing</div></div>
+        </div>
+        <div class="day">
+          <h4>Jeudi</h4>
+          <div class="sess b"><div class="t">18h – 19h</div><div class="d">MMA Enfant (8–15)</div></div>
+          <div class="sess r"><div class="t">19h15 – 20h15</div><div class="d">MMA</div></div>
+          <div class="sess r"><div class="t">20h15 – 21h45</div><div class="d">Muay Thaï</div></div>
+        </div>
+        <div class="day">
+          <h4>Vendredi</h4>
+          <div class="sess r"><div class="t">18h – 19h</div><div class="d">Ados (12–17)</div></div>
+          <div class="sess r"><div class="t">19h15 – 20h15</div><div class="d">MMA</div></div>
+        </div>
+        <div class="day weekend">
+          <h4>Samedi</h4>
+          <div class="sess pink"><div class="t">10h15 – 12h15</div><div class="d">Cardio Boxing</div></div>
+          <div class="sess b"><div class="t">12h30 – 14h</div><div class="d">Cross Training Boxe</div></div>
+        </div>
+      </div>
     </div>
-    <div class="sources" id="sources-documents"></div>
-    <div class="sortie" id="sortie-documents"></div>
-    <div class="usage" id="usage-documents"></div>
   </section>
+
+  <!-- PARTENAIRE IMPACT ACADÉMIE -->
+  <section id="partenaire" class="partner">
+    <div class="wrap">
+      <span class="eyebrow blue">Notre partenaire</span>
+      <h2 class="section-title">Le midi, transforme ta pause en entraînement</h2>
+      <p class="section-intro">Avec notre partenaire <strong>Impact Académie 92</strong>, la boxe, le MMA et le cross training s'invitent sur ta pause déjeuner.</p>
+      <div class="impact-card">
+        <div class="impact-logo"><img src="img/logo-impact.png" alt="Logo Impact Académie 92" loading="lazy"></div>
+        <div class="impact-body">
+          <p class="impact-slogan">Solidarité, Sports, Savoir</p>
+          <h3>Impact Académie 92</h3>
+          <p><strong>Pas le temps le soir ?</strong> Avec Impact Académie 92, entraîne-toi <strong>sur ta pause déjeuner</strong> : boxe, MMA et cross training encadrés, plus des <strong>coachings privés</strong> avec des coachs diplômés. Idéal pour progresser à ton rythme, en petit comité, en complément de tes créneaux au club.</p>
+          <div class="impact-hours">
+            <span class="ih-lab">Cours du midi</span>
+            <span class="ih-slot">12h – 13h</span>
+            <span class="ih-slot">13h – 14h</span>
+          </div>
+          <a href="https://impact-academie92.fr/" class="btn impact-btn" target="_blank" rel="noopener">Consultez notre site</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ropes" aria-hidden="true"></div>
+
+  <!-- FICHES DISCIPLINES (onglets) -->
+  <section id="fiches">
+    <div class="wrap">
+      <span class="eyebrow">En détail</span>
+      <h2 class="section-title">Nos offres</h2>
+      <p class="section-intro">Sélectionne une offre pour voir son descriptif, ses horaires, le public concerné, l'équipement nécessaire et le tarif.</p>
+
+      <!-- Onglets -->
+      <div class="disc-tabs" role="tablist" aria-label="Choisir une discipline">
+        <button class="disc-tab" style="--corner:var(--red)"  role="tab" id="tab-muay"    aria-controls="panel-muay"    aria-selected="true"><span class="dot"></span>Muay Thaï</button>
+        <button class="disc-tab" style="--corner:var(--blue)" role="tab" id="tab-kick"    aria-controls="panel-kick"    aria-selected="false"><span class="dot"></span>Kick-boxing</button>
+        <button class="disc-tab" style="--corner:var(--red)"  role="tab" id="tab-mma"     aria-controls="panel-mma"     aria-selected="false"><span class="dot"></span>MMA</button>
+        <button class="disc-tab" style="--corner:var(--pink)" role="tab" id="tab-lady"    aria-controls="panel-lady"    aria-selected="false"><span class="dot"></span>Cardio Boxing</button>
+        <button class="disc-tab" style="--corner:var(--red)"  role="tab" id="tab-kids"    aria-controls="panel-kids"    aria-selected="false"><span class="dot"></span>Kids / Ados</button>
+        <button class="disc-tab" style="--corner:var(--blue)" role="tab" id="tab-mmakids" aria-controls="panel-mmakids" aria-selected="false"><span class="dot"></span>MMA Enfant</button>
+        <button class="disc-tab" style="--corner:var(--red)"  role="tab" id="tab-cross"   aria-controls="panel-cross"   aria-selected="false"><span class="dot"></span>Cross Training</button>
+        <button class="disc-tab" style="--corner:#ffffff" role="tab" id="tab-mental"   aria-controls="panel-mental"   aria-selected="false"><span class="dot"></span>Coaching mental</button>
+      </div>
+
+      <!-- Panneau : Muay Thaï -->
+      <div class="disc-panel active" id="panel-muay" role="tabpanel" aria-labelledby="tab-muay" style="--corner:var(--red)">
+        <div class="detail">
+          <div class="photo"><img src="img/disc-muay.jpg" alt="Entraînement de Muay Thaï" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin rouge</span></div>
+            <h3 class="dtitle">Muay Thaï</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Mardi : 20h15 – 21h45<br>Jeudi : 20h15 – 21h45</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Aussi appelé boxe thaïlandaise, le Muay Thaï est un art martial originaire de Thaïlande. Surnommé « l'art des huit membres », il combine poings, pieds, coudes et genoux. À la fois discipline physique intense et tradition culturelle, il développe la puissance, la vitesse, la résistance, mais aussi la maîtrise de soi et le respect de l'adversaire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; niveau</div>
+              <p>Adultes, du débutant au compétiteur.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Gants, protège-tibias, protège-dents, coquille, bandes.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique de la boxe (mention « compétition » si combat) obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">320 € / an · 270 € / an tarif étudiant (sur justificatif).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : Kick-boxing -->
+      <div class="disc-panel" id="panel-kick" role="tabpanel" aria-labelledby="tab-kick" style="--corner:var(--blue)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-kick.jpg" alt="Entraînement de kick-boxing" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin bleu</span></div>
+            <h3 class="dtitle">Kick-boxing</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Lundi : 19h30 – 21h<br>Mercredi : 19h30 – 21h</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Le kick-boxing est un sport de combat pieds-poings né de la rencontre entre la boxe anglaise et les coups de pied des arts martiaux. On y travaille les enchaînements bras-jambes, le déplacement et la garde. C'est une discipline complète qui muscle tout le corps, développe l'endurance et l'explosivité, et reste un formidable exutoire au stress du quotidien.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; niveau</div>
+              <p>Adultes, du débutant au compétiteur.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Gants, protège-tibias, protège-dents, coquille, bandes.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique de la boxe (mention « compétition » si combat) obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">320 € / an · 270 € / an tarif étudiant (sur justificatif).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : MMA -->
+      <div class="disc-panel" id="panel-mma" role="tabpanel" aria-labelledby="tab-mma" style="--corner:var(--red)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-mma.jpg" alt="Combat de MMA en cage" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin rouge</span></div>
+            <h3 class="dtitle">MMA</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Lundi : 18h30 – 19h30<br>Mardi : 19h15 – 20h15<br>Jeudi : 19h15 – 20h15<br>Vendredi : 19h15 – 20h15</p>
+            </div>
+            <div class="block">
+              <div class="lab">Cours du midi</div>
+              <p>Possibilité de cours supplémentaires le midi assurés par Impact Académie — voir avec le secrétariat.</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Le MMA (arts martiaux mixtes)* réunit deux grandes familles : la percussion (poings, pieds, genoux, coudes) et la préhension (projections, corps-à-corps, travail au sol et soumissions). C'est la discipline la plus complète des sports de combat : elle demande de la polyvalence, du cardio et de la stratégie. Au club, la pratique est encadrée et progressive, accessible aux débutants comme aux plus confirmés.</p>
+              <p class="legal-note">* Discipline aussi désignée « Pancrace » dans le cadre réglementaire amateur en France.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; niveau</div>
+              <p>Adultes, du débutant au compétiteur.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Mitaines (gants MMA) rembourrées, protège-tibias, protège-dents, coquille.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique du MMA (mention « compétition » si combat) obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">380 € / an · 330 € / an tarif étudiant (MMA seul). Des formules combinées existent (voir <a href="#tarifs" style="color:var(--blue-bright)">Tarifs &amp; formules</a>). Possibilité de cours supplémentaires le midi assurés par Impact Académie — voir avec le secrétariat.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : Cardio Boxing -->
+      <div class="disc-panel" id="panel-lady" role="tabpanel" aria-labelledby="tab-lady" style="--corner:var(--pink)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-cardio.jpg" alt="Séance de cardio boxing" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin rose</span></div>
+            <h3 class="dtitle">Cardio Boxing</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Samedi : 10h15 – 12h15</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Le Cardio Boxing, c'est le kick-boxing en version tonique et accessible : une vraie pratique complète des techniques de boxe. Dans une ambiance bienveillante, on travaille la coordination, la tonicité, le cardio et le renforcement musculaire. Au-delà du sport, c'est un vrai moment de confiance en soi et de défoulement, quel que soit le niveau de départ.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; niveau</div>
+              <p>À partir de 15 ans, débutantes bienvenues.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Gants, protège-tibias, protège-dents, bandes.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique de la boxe obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">230 € / an.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : Kids / Ados -->
+      <div class="disc-panel" id="panel-kids" role="tabpanel" aria-labelledby="tab-kids" style="--corner:var(--red)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-kids.jpg" alt="Jeune boxeur à l'entraînement" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin rouge</span></div>
+            <h3 class="dtitle">Kids / Ados</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Mercredi : 17h30 – 18h45 (dès 8 ans)<br>Vendredi : 18h – 19h (dès 12 ans)</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Le créneau Kids / Ados accueille les jeunes de 8 à 17 ans et les initie à l'ensemble des boxes pieds-poings — kick-boxing, muay thaï — ainsi qu'à des initiations à la boxe anglaise. Dans un cadre sécurisé et ludique, les enfants apprennent la technique de base, la coordination et le contrôle de soi, tout en développant le respect des autres, la discipline et l'esprit d'équipe. Un premier pas idéal vers les sports de combat, encadré par des coachs habitués au jeune public.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; âge</div>
+              <p>De 8 à 17 ans (créneau 8 ans+ le mercredi, 12 ans+ le vendredi).</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Casque, gants, protège-tibias, protège-dents, coquille, bandes.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique de la boxe obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">Kids : 200 € / an · Ados : 230 € / an. Formules avec le MMA Enfant disponibles (voir <a href="#tarifs" style="color:var(--blue-bright)">Tarifs &amp; formules</a>).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : MMA Enfant -->
+      <div class="disc-panel" id="panel-mmakids" role="tabpanel" aria-labelledby="tab-mmakids" style="--corner:var(--blue)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-mmaenfant.jpg" alt="MMA enfant encadré" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin bleu</span></div>
+            <h3 class="dtitle">MMA Enfant</h3>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Mardi : 18h – 19h<br>Jeudi : 18h – 19h</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Le MMA Enfant initie les 8 à 15 ans aux arts martiaux mixtes dans leur forme éducative. Encadrés par des coachs habitués au jeune public, les enfants découvrent progressivement la percussion (coups portés en contrôle) et la préhension (déplacements, corps-à-corps et travail au sol), toujours en toute sécurité. L'accent est mis sur le jeu, la coordination, le respect des règles et la confiance en soi, sans esprit de compétition imposé.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; âge</div>
+              <p>Enfants &amp; ados de 8 à 15 ans.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Casque, mitaines (gants MMA) rembourrées, protège-tibias, protège-dents, coquille.</p>
+            </div>
+            <div class="block">
+              <div class="lab warn">À l'inscription</div>
+              <p>Certificat médical de non contre-indication à la pratique du MMA obligatoire.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours"><strong>270 € / an.</strong> Formules possibles avec la boxe Kids / Ados (voir <a href="#tarifs" style="color:var(--blue-bright)">Tarifs &amp; formules</a>).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panneau : Cross Training Boxe -->
+      <div class="disc-panel" id="panel-cross" role="tabpanel" aria-labelledby="tab-cross" style="--corner:var(--red)" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-cross.jpg" alt="Cross training boxe" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coin rouge</span></div>
+            <h3 class="dtitle">Cross Training Boxe</h3>
+            <span class="pill">Réservé aux adhérents · places limitées</span>
+            <div class="block">
+              <div class="lab">Horaires</div>
+              <p class="hours">Samedi : 12h30 – 14h</p>
+            </div>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Réservée aux adhérents, la session de cross training boxe propose des circuits adaptés à la boxe pieds-poings : cardio, renforcement musculaire, mobilité et gainage. L'objectif : compléter le travail technique par une préparation physique générale qui améliore l'endurance, la puissance et la récupération. Places limitées, ambiance intense et conviviale.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public</div>
+              <p>Adhérents du club, places limitées.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Équipements</div>
+              <p>Tenue de sport, gants de boxe, gourde, serviette.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Tarif</div>
+              <p class="hours">À voir avec le secrétariat · places limitées.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="disc-panel" id="panel-mental" role="tabpanel" aria-labelledby="tab-mental" style="--corner:#ffffff" hidden>
+        <div class="detail">
+          <div class="photo"><img src="img/disc-coaching.jpg" alt="Séance de coaching mental au club" loading="lazy"></div>
+          <div>
+            <div class="dhead"><span class="ctag">Coaching</span></div>
+            <h3 class="dtitle">Coaching mental</h3>
+            <span class="pill">Grand public &amp; compétiteurs · tous âges</span>
+            <div class="block">
+              <div class="lab">La discipline</div>
+              <p>Coaching mental pour boxeurs et pratiquants de sports de combat, du débutant au compétiteur et pour tous les âges. On travaille la gestion du stress, la confiance en soi et l'amélioration des performances — pour le grand public comme en accompagnement avant compétition.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Encadrement</div>
+              <p>Assuré par une coach titulaire d'un diplôme reconnu par l'État.</p>
+            </div>
+            <div class="block">
+              <div class="lab">Public &amp; niveau</div>
+              <p>Tous âges, du débutant au compétiteur.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TARIFS & FORMULES -->
+  <section id="tarifs" class="pricing">
+    <div class="wrap">
+      <span class="eyebrow">Cotisations annuelles</span>
+      <h2 class="section-title">Tarifs &amp; formules</h2>
+      <p class="section-intro">Cotisations annuelles par discipline et formules combinées. Prise de licence fédérale incluse. Certificat médical obligatoire à l'inscription.</p>
+
+      <div class="price-grid">
+
+        <div class="price-card" style="--corner:var(--blue)">
+          <h3>Kick-boxing</h3>
+          <div class="amount">320 €<small> / an</small></div>
+          <p class="sub">270 € / an en tarif étudiant</p>
+          <ul>
+            <li>Lundi &amp; mercredi · 19h30 – 21h</li>
+            <li>Adultes, tous niveaux · Hors commune : +20 €</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--red)">
+          <h3>Muay Thaï</h3>
+          <div class="amount">320 €<small> / an</small></div>
+          <p class="sub">270 € / an en tarif étudiant</p>
+          <ul>
+            <li>Mardi &amp; jeudi · 20h15 – 21h45</li>
+            <li>Adultes · Hors commune : +20 €</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--red)">
+          <h3>MMA</h3>
+          <div class="amount">380 €<small> / an</small></div>
+          <p class="sub">330 € / an en tarif étudiant</p>
+          <ul>
+            <li>Lun · 18h30 – 19h30 · mar &amp; jeu · 19h15 – 20h15 · ven · 19h15 – 20h15</li>
+            <li>Adultes · Hors commune : +20 €</li>
+            <li>Cours du midi possibles via Impact Académie — voir secrétariat</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--blue)">
+          <h3>MMA Enfant</h3>
+          <div class="amount">270 €<small> / an</small></div>
+          <p class="sub">Formules possibles avec la boxe Kids / Ados</p>
+          <ul>
+            <li>Mar &amp; jeu · 18h – 19h</li>
+            <li>Enfants &amp; ados · 8–15 ans · Hors commune : +20 €</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--red)">
+          <h3>Kids / Ados</h3>
+          <div class="amount">200 – 230 €<small> / an</small></div>
+          <p class="sub">Kids : 200 € · Ados : 230 €</p>
+          <ul>
+            <li>De 8 à 17 ans</li>
+            <li>Toutes boxes pieds-poings · Hors commune : +20 €</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--pink)">
+          <h3>Cardio Boxing</h3>
+          <div class="amount">230 €<small> / an</small></div>
+          <p class="sub">Cardio · tonicité · confiance en soi</p>
+          <ul>
+            <li>Samedi · 10h15 – 12h15</li>
+            <li>À partir de 15 ans, débutantes bienvenues</li>
+            <li>Hors commune : +20 €</li>
+          </ul>
+        </div>
+
+        <div class="price-card" style="--corner:var(--red)">
+          <h3>Cross Training Boxe</h3>
+          <div class="amount amount--txt">À voir avec le secrétariat</div>
+          <p class="sub">Réservé aux adhérents · places limitées</p>
+          <ul>
+            <li>Samedi · 12h30 – 14h</li>
+            <li>Adhérents du club</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <p class="formulas-title">Formules multi-disciplines</p>
+      <div class="formulas">
+        <div class="formula">
+          <div class="fname">Kick + Thaï<small>Étudiant : 370 € · Hors commune +20 €</small></div>
+          <div class="fprice">450 €</div>
+        </div>
+        <div class="formula">
+          <div class="fname">MMA + Kick ou Thaï<small>Étudiant : 410 € · Hors commune +20 €</small></div>
+          <div class="fprice">490 €</div>
+        </div>
+        <div class="formula">
+          <div class="fname">MMA + Kick + Thaï<small>Étudiant : 430 € · Hors commune +20 €</small></div>
+          <div class="fprice">510 €</div>
+        </div>
+        <div class="formula">
+          <div class="fname">Cardio Boxing + Kick ou Thaï<small>Étudiant : 340 € · Hors commune +20 €</small></div>
+          <div class="fprice">380 €</div>
+        </div>
+      </div>
+
+      <p class="formulas-title">Formules avec le MMA Enfant</p>
+      <div class="formulas">
+        <div class="formula">
+          <div class="fname">Kids 8-12 + MMA Enfant<small>Boxe enfant + MMA Enfant · Hors commune +20 €</small></div>
+          <div class="fprice">370 €</div>
+        </div>
+        <div class="formula">
+          <div class="fname">Boxe ados (12+) + MMA Enfant<small>Hors commune +20 €</small></div>
+          <div class="fprice">390 €</div>
+        </div>
+      </div>
+
+      <p class="price-note">
+        <strong>Bon à savoir :</strong> tous les tarifs sont annuels et incluent l'affiliation à la fédération. Un <strong>certificat médical</strong> de non contre-indication à la pratique de la boxe (mention « compétition » en cas de combat) est <strong>obligatoire pour toutes les disciplines</strong>. Tarif étudiant sur justificatif. <strong>Hors commune : +20 €.</strong> Nous acceptons le <strong>PASS92</strong> uniquement. Possibilité de règlement en plusieurs fois ou d'encaissement ultérieur.
+      </p>
+
+      <div class="hero-actions" style="margin-top:2rem">
+        <a href="https://tally.so/r/vG6oAQ" class="btn btn-primary" target="_blank" rel="noopener">S'inscrire en ligne</a>
+        <a href="#contact" class="btn btn-ghost">Poser une question</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="ropes" aria-hidden="true"></div>
+
+  <!-- LE CLUB / ASSOCIATION -->
+  <section id="club" class="histo">
+    <div class="wrap">
+      <div class="histo-grid">
+        <div>
+          <span class="eyebrow blue">Notre association</span>
+          <h2 class="section-title">Le club</h2>
+          <p>Le Châtillon Boxing Club — <strong>Académie Châtillonnaise des Sports de Contacts (ACSC92)</strong> — est une <strong>association loi 1901 fondée en 1981 par son président Régis Dubois</strong>. Depuis des décennies, elle œuvre et transmet sa passion des sports de combat pieds-poings à travers des cours encadrés par des <strong>coachs diplômés</strong> — brevet de moniteur fédéral et diplômes d'État — dont la plupart affichent un <strong>palmarès de compétiteur de haut niveau</strong>.</p>
+          <p>Aujourd'hui, le club rassemble plus de 200 membres, des plus jeunes aux adultes, dans un même esprit : la technique, le dépassement de soi et le respect.</p>
+        </div>
+        <figure class="founder">
+          <img src="img/regis.jpg" alt="Régis Dubois, président et fondateur du Châtillon Boxing Club" loading="lazy">
+          <figcaption>Régis Dubois — Président &amp; fondateur</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- L'ÉQUIPE / COACHS -->
+  <section id="coachs">
+    <div class="wrap">
+      <span class="eyebrow">Ceux qui vous encadrent</span>
+      <h2 class="section-title">L'équipe</h2>
+      <p class="section-intro">Des coachs diplômés (brevet de moniteur fédéral, diplômes d'État), pour la plupart, anciens et récents compétiteurs de haut niveau. Survolez un portrait pour le découvrir en couleur.</p>
+      <p class="team-osteo"><strong>Ostéopathie —</strong> Sullyvan Grosbois, coach de kick-boxing, est également <strong>ostéopathe</strong> et propose un <strong>tarif préférentiel aux adhérents</strong> du club.</p>
+      <div class="team">
+        <div class="team-block" style="--accent:var(--blue)">
+          <h3 class="team-block-title">Kick-boxing</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/baptiste.jpg" alt="Baptiste, directeur technique" loading="lazy"><span class="cbadge">Directeur technique</span></div>
+            <div class="cbody">
+              <h4 class="cname">Baptiste</h4>
+              <p class="cdisc">Full contact · Kick-boxing</p>
+              <p class="cdiploma">BPJEPS · BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/paolo.jpg" alt="Paolo, coach Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Paolo</h4>
+              <p class="cdisc">Kick-boxing</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/jocelyn.jpg" alt="Jocelyn, coach Kick-boxing · Cross Training" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Jocelyn</h4>
+              <p class="cdisc">Kick-boxing · Cross Training</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/jerome.jpg" alt="Jérôme, coach Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Jérôme</h4>
+              <p class="cdisc">Kick-boxing</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/paul.jpg" alt="Paul, coach Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Paul</h4>
+              <p class="cdisc">Kick-boxing</p>
+              <p class="cdiploma">BMF2</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/sullyvan.jpg" alt="Sullyvan Grosbois, coach Kick-boxing et ostéopathe" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Sullyvan Grosbois</h4>
+              <p class="cdisc">Kick-boxing</p>
+              <p class="cdiploma">CQP · BMF2</p>
+              <p class="cnote">Ostéopathe · tarif préférentiel adhérents</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/vincent.jpg" alt="Vincent, coach Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Vincent</h4>
+              <p class="cdisc">Kick-boxing</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/olivier.jpg" alt="Olivier, coach Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Olivier</h4>
+              <p class="cdisc">Kick-boxing</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:var(--red)">
+          <h3 class="team-block-title">Muay Thaï</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/issa.jpg" alt="Issa, coach Muay Thaï" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Issa</h4>
+              <p class="cdisc">Muay Thaï</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/aurelien.jpg" alt="Aurélien, coach Muay Thaï" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Aurélien</h4>
+              <p class="cdisc">Muay Thaï</p>
+              <p class="cdiploma">BPJEPS</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/cyril.jpg" alt="Cyril, coach Muay Thaï" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Cyril</h4>
+              <p class="cdisc">Muay Thaï</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/antoine.jpg" alt="Antoine, coach Muay Thaï" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Antoine</h4>
+              <p class="cdisc">Muay Thaï</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/lusko.jpg" alt="Lusko, coach Muay Thaï et Kids/Ados" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Lusko</h4>
+              <p class="cdisc">Muay Thaï · Kids/Ados</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:var(--red)">
+          <h3 class="team-block-title">MMA</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/saikou.jpg" alt="Saïkou, coach MMA" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Saïkou</h4>
+              <p class="cdisc">MMA</p>
+              <p class="cdiploma">BPJEPS · BMF3 · BF2</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/khadim.jpg" alt="Khadim, coach MMA et MMA Enfant" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Khadim</h4>
+              <p class="cdisc">MMA · MMA Enfant</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:var(--pink)">
+          <h3 class="team-block-title">Cardio Boxing</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/pauline.jpg" alt="Pauline, coach Cardio Boxing · Kids/Ados" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Pauline</h4>
+              <p class="cdisc">Cardio Boxing · Kids/Ados</p>
+              <p class="cdiploma">CQP · BMF2</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/emma.jpg" alt="Emma, coach Cardio Boxing · Kids/Ados" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Emma</h4>
+              <p class="cdisc">Cardio Boxing · Kids/Ados</p>
+              <p class="cdiploma">BMF2</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/fanny.jpg" alt="Fanny, coach Cardio Boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Fanny</h4>
+              <p class="cdisc">Cardio Boxing</p>
+              <p class="cdiploma">BMF2</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:var(--blue)">
+          <h3 class="team-block-title">Kids/Ados</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/etienne.jpg" alt="Etienne, coach Kids/Ados, Kick-boxing et Cross Training" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Etienne</h4>
+              <p class="cdisc">Kids/Ados · Kick-boxing · Cross Training</p>
+              <p class="cdiploma">BMF3</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/mickael.jpg" alt="Mickael, coach Kids/Ados · Muay Thaï" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Mickael</h4>
+              <p class="cdisc">Kids/Ados · Muay Thaï</p>
+              <p class="cdiploma">BMF2</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/axel.jpg" alt="Axel, coach Kids/Ados · Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Axel</h4>
+              <p class="cdisc">Kids/Ados · Kick-boxing</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:var(--red)">
+          <h3 class="team-block-title">MMA Enfant</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/brian.jpg" alt="Brian, coach MMA Enfant" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Brian</h4>
+              <p class="cdisc">MMA Enfant</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/theophile.jpg" alt="Théophile, coach MMA Enfant" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Théophile</h4>
+              <p class="cdisc">MMA Enfant</p>
+              <p class="cdiploma">BMF en cours d'obtention</p>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="team-block" style="--accent:#ffffff">
+          <h3 class="team-block-title">Coaching mental</h3>
+          <div class="team-row">
+          <article class="coach">
+            <div class="cphoto"><img src="img/amelle.jpg" alt="Amelle, coach mental et secrétaire" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Amelle</h4>
+              <p class="cdisc">Coach mental · Secrétaire</p>
+              <p class="cdiploma">Diplôme d'État de préparateur neuro-psychologique</p>
+            </div>
+          </article>
+          </div>
+        </div>
+      </div>
+      <div class="palmares-cta">
+        <a href="palmares.php" class="btn-palmares">Palmarès des combattants →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="band">
+    <div class="glow b" aria-hidden="true"></div>
+    <div class="glow r" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2>Viens enfiler<br>les gants.</h2>
+      <p>Inscriptions ouvertes en ligne — rejoins le club sur la discipline de ton choix, du débutant au compétiteur.</p>
+      <a href="https://tally.so/r/vG6oAQ" class="btn btn-primary" target="_blank" rel="noopener">S'inscrire en ligne</a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <span class="eyebrow">On t'attend</span>
+      <h2 class="section-title">Nous contacter</h2>
+      <div class="contact-grid">
+        <div>
+          <div class="info-row"><div class="k">Adresse</div><div class="v">Espace Maison Blanche — Salle de boxe, 3ᵉ étage<br>2 avenue Saint-Exupéry, 92320 Châtillon</div></div>
+          <div class="info-row"><div class="k">Téléphone</div><div class="v"><a href="tel:+33652501012">06 52 50 10 12</a> · <a href="tel:+33679220967">06 79 22 09 67</a></div></div>
+          <div class="info-row"><div class="k">Email</div><div class="v"><a href="mailto:chatillon.boxe@gmail.com">chatillon.boxe@gmail.com</a></div></div>
+          <div class="info-row"><div class="k">Inscriptions</div><div class="v"><a href="https://tally.so/r/vG6oAQ" target="_blank" rel="noopener">S'inscrire en ligne</a></div></div>
+          <div class="info-row"><div class="k">Réseaux</div><div class="v">
+            <div class="socials">
+              <a class="social-btn" href="https://instagram.com/chatillonboxingclub" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.5-.9a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z"/></svg><span>Instagram</span></a>
+              <a class="social-btn" href="https://www.facebook.com/share/1CghWNiPB9/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg><span>Facebook</span></a>
+            </div>
+          </div></div>
+        </div>
+        <div>
+          <div class="map map--contact"><iframe loading="lazy" title="Carte du club" src="https://www.google.com/maps?q=2+avenue+Saint-Exup%C3%A9ry+92320+Ch%C3%A2tillon&output=embed"></iframe></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer>
-  Les Fondamentaux de l'IA &middot; 3IW &middot; ESGI
-  &mdash; contrat de route : <code>app/CONTRAT.md</code>
+  <div class="wrap foot">
+    <a href="#top" class="brand">
+      <img class="brand-logo" src="img/logo-acsc92.png" alt="Logo Châtillon Boxing Club — ACSC92">
+      <span>CHÂTILLON BC<small>ACSC92 · Association loi 1901 · depuis 1981</small></span>
+    </a>
+    <p>© 2026 Châtillon Boxing Club — Espace Maison Blanche, 92320 Châtillon.<br>
+    </p>
+  </div>
 </footer>
 
+<script src="script.js"></script>
+
+<!-- ===== Assistant IA (chatbot) : interface ===== -->
+<div id="cbcChat" class="cbc-chat">
+  <button id="cbcToggle" class="cbc-toggle" aria-label="Ouvrir l'assistant du club" aria-expanded="false" aria-controls="cbcPanel">
+    <svg class="cbc-bubble" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3c5.5 0 10 3.6 10 8s-4.5 8-10 8a11 11 0 0 1-3-.4L4 21l1.3-3.6A7.4 7.4 0 0 1 2 11c0-4.4 4.5-8 10-8z"/></svg>
+    <svg class="cbc-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+
+  <div id="cbcPanel" class="cbc-panel" role="dialog" aria-label="Assistant du Chatillon Boxing Club" hidden>
+    <div class="cbc-head">
+      <div class="cbc-head-id">
+        <span class="cbc-dot" aria-hidden="true"></span>
+        <div>
+          <strong>Assistant du club</strong>
+          <small>Reponses indicatives &middot; a confirmer au secretariat</small>
+        </div>
+      </div>
+      <button class="cbc-close" id="cbcClose" aria-label="Fermer l'assistant">&#10005;</button>
+    </div>
+
+    <div class="cbc-log" id="cbcLog" aria-live="polite"></div>
+
+    <div class="cbc-suggests" id="cbcSuggests">
+      <button type="button" data-fill="Bonjour, je me suis inscrit au cours de Muay Thai il y a deux semaines mais je n'ai toujours pas recu ma confirmation par mail, et le paiement a bien ete debite sur mon compte. Pouvez-vous verifier mon dossier ? Merci d'avance.">Charger un exemple de ticket</button>
+    </div>
+
+    <form class="cbc-input" id="cbcForm" autocomplete="off">
+      <input id="cbcText" type="text" placeholder="Colle un texte a resumer..." aria-label="Ecris ton message">
+      <button type="submit" id="cbcSend" aria-label="Envoyer">&#10148;</button>
+    </form>
+  </div>
+</div>
+
 <script>
-// Ce fichier est fourni et gele. Le modifier est hors sujet et non note.
-// Il n'appelle QUE les routes de votre serveur, jamais le modele directement.
+(function () {
+  "use strict";
 
-const ONGLETS = ["resumer", "assistant", "documents"];
+  // ============================================================
+  //  CONFIG : la route de TON serveur FastAPI a appeler.
+  //  - Meme origine (front servi par FastAPI)  -> "/api/assistant"
+  //  - Serveur separe (site PHP + API a part)   -> URL complete,
+  //    ex : "http://localhost:8000/api/assistant"
+  // ============================================================
+  var CBC_ENDPOINT = "/api/resumer";
+  var CBC_TON = "neutre"; // "neutre" ou "direct"
 
-document.querySelectorAll('nav button').forEach((bouton) => {
-  bouton.addEventListener('click', () => {
-    ONGLETS.forEach((nom) => {
-      const actif = nom === bouton.dataset.onglet;
-      document.getElementById('panneau-' + nom).hidden = !actif;
-      document.querySelector(`nav button[data-onglet="${nom}"]`)
-        .setAttribute('aria-selected', String(actif));
+  // Construit le corps JSON envoye a la route (adapte a ta route).
+  function corpsRequete(message) {
+    return { texte: message, ton: CBC_TON };
+  }
+
+  // ---- References DOM ----
+  var chat     = document.getElementById("cbcChat");
+  var toggle   = document.getElementById("cbcToggle");
+  var fermer   = document.getElementById("cbcClose");
+  var panneau  = document.getElementById("cbcPanel");
+  var journal  = document.getElementById("cbcLog");
+  var form     = document.getElementById("cbcForm");
+  var champ    = document.getElementById("cbcText");
+  var envoi    = document.getElementById("cbcSend");
+  var suggests = document.getElementById("cbcSuggests");
+  var accueilAffiche = false;
+
+  // ---- Ouverture / fermeture ----
+  function ouvrir() {
+    chat.classList.add("open");
+    panneau.hidden = false;
+    toggle.setAttribute("aria-expanded", "true");
+    if (!accueilAffiche) {
+      ajouterMessage("bot", "Salut ! Colle ici le message d'un client (un ticket), je t'en renvoie un resume.");
+      accueilAffiche = true;
+    }
+    champ.focus();
+  }
+  function fermerPanneau() {
+    chat.classList.remove("open");
+    panneau.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+  }
+  toggle.addEventListener("click", function () {
+    panneau.hidden ? ouvrir() : fermerPanneau();
+  });
+  fermer.addEventListener("click", fermerPanneau);
+
+  // ---- Ajout d'une bulle dans le journal ----
+  function ajouterMessage(role, texte) {
+    var div = document.createElement("div");
+    div.className = "cbc-msg " + role;
+    div.textContent = texte || "";
+    journal.appendChild(div);
+    journal.scrollTop = journal.scrollHeight;
+    return div;
+  }
+
+  // ---- Puces de suggestion ----
+  suggests.querySelectorAll("button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var fill = b.getAttribute("data-fill");
+      if (fill) { champ.value = fill; champ.focus(); return; }
+      champ.value = b.textContent.replace(/\s+/g, " ").trim();
+      form.requestSubmit();
     });
   });
-});
 
-function corpsDeLaRequete(route) {
-  if (route === '/api/resumer') {
-    return {
-      texte: document.getElementById('texte').value,
-      ton: document.getElementById('ton').value,
-    };
-  }
-  const cle = route === '/api/assistant' ? 'assistant' : 'documents';
-  return { question: document.getElementById('question-' + cle).value };
-}
+  // ---- Envoi + lecture du flux SSE ----
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var message = champ.value.trim();
+    if (!message) return;
 
-function nomDuPanneau(route) {
-  return route.split('/').pop();
-}
+    ajouterMessage("user", message);
+    champ.value = "";
+    champ.disabled = true;
+    envoi.disabled = true;
 
-async function envoyer(bouton) {
-  const route = bouton.dataset.route;
-  const nom = nomDuPanneau(route);
-  const sortie = document.getElementById('sortie-' + nom);
-  const usage = document.getElementById('usage-' + nom);
-  const sources = document.getElementById('sources-' + nom);
+    var bulle = ajouterMessage("bot", "");
+    bulle.classList.add("cbc-cursor");
 
-  bouton.disabled = true;
-  sortie.className = 'sortie attente';
-  sortie.textContent = 'Le modèle réfléchit...';
-  usage.textContent = '';
-  if (sources) sources.innerHTML = '';
-
-  const debut = performance.now();
-  try {
-    const reponse = await fetch(route, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(corpsDeLaRequete(route)),
+    envoyer(message, bulle).finally(function () {
+      bulle.classList.remove("cbc-cursor");
+      champ.disabled = false;
+      envoi.disabled = false;
+      champ.focus();
     });
+  });
 
-    // Une erreur arrive en JSON classique, jamais en SSE : voir le contrat.
-    if (!reponse.ok) {
-      const details = await reponse.json().catch(() => ({}));
-      throw new Error(details.erreur || `Le serveur a répondu ${reponse.status}.`);
-    }
+  // Reproduit la logique de lecture SSE du front du TP :
+  // le serveur renvoie des lignes "data: {json}\n\n" avec delta / done / usage.
+  async function envoyer(message, bulle) {
+    try {
+      var reponse = await fetch(CBC_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(corpsRequete(message)),
+      });
 
-    sortie.className = 'sortie curseur';
-    sortie.textContent = '';
-    let premierFragment = null;
+      // Une erreur arrive en JSON classique, jamais en SSE.
+      if (!reponse.ok) {
+        var details = await reponse.json().catch(function () { return {}; });
+        throw new Error(details.erreur || ("Le serveur a repondu " + reponse.status + "."));
+      }
 
-    const lecteur = reponse.body.getReader();
-    const decodeur = new TextDecoder();
-    let tampon = '';
+      var lecteur = reponse.body.getReader();
+      var decodeur = new TextDecoder();
+      var tampon = "";
+      var recu = "";
 
-    for (;;) {
-      const { done, value } = await lecteur.read();
-      if (done) break;
-      tampon += decodeur.decode(value, { stream: true });
-      const morceaux = tampon.split('\n\n');
-      tampon = morceaux.pop();
-      for (const morceau of morceaux) {
-        const ligne = morceau.split('\n').find((l) => l.startsWith('data: '));
-        if (!ligne) continue;
-        const charge = ligne.slice(6).trim();
-        if (!charge || charge === '[DONE]') continue;
-        const evenement = JSON.parse(charge);
-
-        if (evenement.sources && sources) {
-          sources.innerHTML = '<h3>Sources retenues</h3>' + evenement.sources
-            .map((s) => `<span class="source">${s.titre}
-                         <span>${Number(s.score).toFixed(2)}</span></span>`)
-            .join('');
-        }
-        if (evenement.delta) {
-          if (premierFragment === null) premierFragment = performance.now() - debut;
-          sortie.textContent += evenement.delta;
-        }
-        if (evenement.done) {
-          const u = evenement.usage || {};
-          usage.innerHTML = [
-            `entrée <b>${u.entree ?? '?'}</b> tokens`,
-            `sortie <b>${u.sortie ?? '?'}</b> tokens`,
-            `serveur <b>${u.ms ?? '?'}</b> ms`,
-            `premier fragment <b>${premierFragment ? Math.round(premierFragment) : '?'}</b> ms`,
-          ].join('');
+      for (;;) {
+        var lu = await lecteur.read();
+        if (lu.done) break;
+        tampon += decodeur.decode(lu.value, { stream: true });
+        var morceaux = tampon.split("\n\n");
+        tampon = morceaux.pop();
+        for (var i = 0; i < morceaux.length; i++) {
+          var ligne = morceaux[i].split("\n").find(function (l) { return l.indexOf("data: ") === 0; });
+          if (!ligne) continue;
+          var charge = ligne.slice(6).trim();
+          if (!charge || charge === "[DONE]") continue;
+          var evenement = JSON.parse(charge);
+          if (evenement.delta) {
+            recu += evenement.delta;
+            bulle.textContent = recu;
+            journal.scrollTop = journal.scrollHeight;
+          }
+          // evenement.done / evenement.usage : ignores ici (pas d'UI de tokens dans le widget)
         }
       }
-    }
-    sortie.className = 'sortie';
-    if (!sortie.textContent.trim()) {
-      sortie.className = 'sortie attente';
-      sortie.textContent = 'Le serveur a répondu, mais sans aucun fragment.';
-    }
-  } catch (erreur) {
-    sortie.className = 'sortie';
-    sortie.innerHTML = '';
-    const boite = document.createElement('div');
-    boite.className = 'erreur';
-    boite.textContent = erreur.message;
-    sortie.appendChild(boite);
-  } finally {
-    bouton.disabled = false;
-  }
-}
 
-document.querySelectorAll('button.envoyer').forEach((bouton) => {
-  bouton.addEventListener('click', () => envoyer(bouton));
-});
+      if (!recu.trim()) {
+        bulle.textContent = "Le serveur a repondu, mais sans aucun texte.";
+      }
+    } catch (erreur) {
+      bulle.classList.add("err");
+      bulle.textContent = erreur.message + " (Verifie que ton serveur tourne et que CBC_ENDPOINT est correct.)";
+    }
+  }
+})();
 </script>
 </body>
 </html>
