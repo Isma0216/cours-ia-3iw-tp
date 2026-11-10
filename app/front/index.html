@@ -13,8 +13,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-
-<!-- ===== Assistant IA (chatbot) : styles ===== -->
 <style id="cbc-styles">
   .cbc-chat{position:fixed;right:20px;bottom:20px;z-index:200;font-family:var(--body)}
   /* Bouton flottant */
@@ -50,8 +48,14 @@
   .cbc-msg.bot{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line);border-bottom-left-radius:4px}
   .cbc-msg.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
   .cbc-msg.err{align-self:flex-start;background:#2a1416;border:1px solid var(--red);color:#ffb4b4}
-  .cbc-msg .cbc-cursor::after{content:"▌";color:var(--red-bright);animation:cbcBlink 1s steps(2) infinite}
+  .cbc-msg.cbc-cursor::after{content:"▌";color:var(--red-bright);animation:cbcBlink 1s steps(2) infinite}
   @keyframes cbcBlink{50%{opacity:0}}
+  /* Indicateur "l'assistant reflechit" : trois points qui rebondissent */
+  .cbc-dots{display:inline-flex;align-items:center;gap:5px;padding:4px 2px}
+  .cbc-dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:cbcDot 1.2s infinite ease-in-out}
+  .cbc-dots i:nth-child(2){animation-delay:.15s}
+  .cbc-dots i:nth-child(3){animation-delay:.3s}
+  @keyframes cbcDot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
   /* Suggestions */
   .cbc-suggests{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
   .cbc-suggests button{font-family:var(--util);text-transform:uppercase;letter-spacing:.04em;
@@ -801,14 +805,6 @@
               <p class="cdisc">Kick-boxing</p>
             </div>
           </article>
-          <article class="coach">
-            <div class="cphoto"><img src="img/olivier.jpg" alt="Olivier, coach Kick-boxing" loading="lazy"></div>
-            <div class="cbody">
-              <h4 class="cname">Olivier</h4>
-              <p class="cdisc">Kick-boxing</p>
-              <p class="cdiploma">BMF3</p>
-            </div>
-          </article>
           </div>
         </div>
         <div class="team-block" style="--accent:var(--red)">
@@ -854,17 +850,23 @@
               <p class="cdiploma">BMF en cours d'obtention</p>
             </div>
           </article>
+          <article class="coach">
+            <div class="cphoto"><img src="img/guy.jpg" alt="Khadim / Guy, coach Muay Thaï et Kick-boxing" loading="lazy"></div>
+            <div class="cbody">
+              <h4 class="cname">Khadim / Guy</h4>
+              <p class="cdisc">Muay Thaï · Kick-boxing</p>
+            </div>
+          </article>
           </div>
         </div>
         <div class="team-block" style="--accent:var(--red)">
           <h3 class="team-block-title">MMA</h3>
           <div class="team-row">
           <article class="coach">
-            <div class="cphoto"><img src="img/saikou.jpg" alt="Saïkou, coach MMA" loading="lazy"></div>
+            <div class="cphoto"><img src="img/najib.jpg" alt="Najib, coach MMA" loading="lazy"></div>
             <div class="cbody">
-              <h4 class="cname">Saïkou</h4>
+              <h4 class="cname">Najib</h4>
               <p class="cdisc">MMA</p>
-              <p class="cdiploma">BPJEPS · BMF3 · BF2</p>
             </div>
           </article>
           <article class="coach">
@@ -1049,11 +1051,13 @@
     <div class="cbc-log" id="cbcLog" aria-live="polite"></div>
 
     <div class="cbc-suggests" id="cbcSuggests">
-      <button type="button" data-fill="Bonjour, je me suis inscrit au cours de Muay Thai il y a deux semaines mais je n'ai toujours pas recu ma confirmation par mail, et le paiement a bien ete debite sur mon compte. Pouvez-vous verifier mon dossier ? Merci d'avance.">Charger un exemple de ticket</button>
+      <button type="button">Quels sont les horaires du Muay Thaï ?</button>
+      <button type="button">Combien coûte le MMA ?</button>
+      <button type="button">Comment s'inscrire ?</button>
     </div>
 
     <form class="cbc-input" id="cbcForm" autocomplete="off">
-      <input id="cbcText" type="text" placeholder="Colle un texte a resumer..." aria-label="Ecris ton message">
+      <input id="cbcText" type="text" placeholder="Pose ta question sur le club..." aria-label="Ecris ton message">
       <button type="submit" id="cbcSend" aria-label="Envoyer">&#10148;</button>
     </form>
   </div>
@@ -1069,12 +1073,11 @@
   //  - Serveur separe (site PHP + API a part)   -> URL complete,
   //    ex : "http://localhost:8000/api/assistant"
   // ============================================================
-  var CBC_ENDPOINT = "/api/resumer";
-  var CBC_TON = "neutre"; // "neutre" ou "direct"
+  var CBC_ENDPOINT = "/api/documents";
 
-  // Construit le corps JSON envoye a la route (adapte a ta route).
+  // Construit le corps JSON envoye a la route (contrat, Route 3).
   function corpsRequete(message) {
-    return { texte: message, ton: CBC_TON };
+    return { question: message };
   }
 
   // ---- References DOM ----
@@ -1095,7 +1098,7 @@
     panneau.hidden = false;
     toggle.setAttribute("aria-expanded", "true");
     if (!accueilAffiche) {
-      ajouterMessage("bot", "Salut ! Colle ici le message d'un client (un ticket), je t'en renvoie un resume.");
+      ajouterMessage("bot", "Salut ! Pose-moi une question sur le club : horaires, tarifs, coachs, inscription...");
       accueilAffiche = true;
     }
     champ.focus();
@@ -1142,7 +1145,7 @@
     envoi.disabled = true;
 
     var bulle = ajouterMessage("bot", "");
-    bulle.classList.add("cbc-cursor");
+    afficherReflexion(bulle);
 
     envoyer(message, bulle).finally(function () {
       bulle.classList.remove("cbc-cursor");
@@ -1154,7 +1157,65 @@
 
   // Reproduit la logique de lecture SSE du front du TP :
   // le serveur renvoie des lignes "data: {json}\n\n" avec delta / done / usage.
+  // ---- "L'assistant reflechit" : affiche jusqu'au premier mot ----
+  function afficherReflexion(bulle) {
+    bulle.innerHTML = '<span class="cbc-dots" aria-label="L\'assistant reflechit"><i></i><i></i><i></i></span>';
+  }
+
+  // ---- Effet machine a ecrire ----
+  // Le modele local est tres rapide : les fragments arrivent presque d'un bloc.
+  // On les met en file d'attente et on les revele lettre par lettre a rythme
+  // regulier. S'il y a beaucoup de retard, on revele plusieurs lettres par
+  // tick pour ne jamais trainer.
+  function creerMachine(bulle) {
+    var enAttente = "";   // recu du serveur, pas encore affiche
+    var affiche = "";     // deja a l'ecran
+    var fini = false;     // le serveur a fini d'envoyer
+    var demarre = false;
+    var terminer;
+    var termine = new Promise(function (r) { terminer = r; });
+    var minuteur = null;
+
+    function tick() {
+      if (enAttente.length) {
+        var n = Math.max(1, Math.ceil(enAttente.length / 30));
+        affiche += enAttente.slice(0, n);
+        enAttente = enAttente.slice(n);
+        bulle.textContent = affiche;
+        journal.scrollTop = journal.scrollHeight;
+      } else if (fini) {
+        clearInterval(minuteur);
+        terminer();
+      }
+    }
+
+    return {
+      ajouter: function (texte) {
+        if (!demarre) {
+          demarre = true;
+          bulle.textContent = "";          // retire les trois points
+          bulle.classList.add("cbc-cursor");
+          minuteur = setInterval(tick, 18);
+        }
+        enAttente += texte;
+      },
+      // Attend que tout le texte recu soit affiche.
+      finir: function () {
+        fini = true;
+        if (!demarre) terminer();
+        return termine;
+      },
+      // En cas d'erreur : on coupe tout de suite.
+      stopper: function () {
+        clearInterval(minuteur);
+        terminer();
+      },
+      texte: function () { return affiche + enAttente; },
+    };
+  }
+
   async function envoyer(message, bulle) {
+    var machine = creerMachine(bulle);
     try {
       var reponse = await fetch(CBC_ENDPOINT, {
         method: "POST",
@@ -1171,7 +1232,6 @@
       var lecteur = reponse.body.getReader();
       var decodeur = new TextDecoder();
       var tampon = "";
-      var recu = "";
 
       for (;;) {
         var lu = await lecteur.read();
@@ -1186,18 +1246,19 @@
           if (!charge || charge === "[DONE]") continue;
           var evenement = JSON.parse(charge);
           if (evenement.delta) {
-            recu += evenement.delta;
-            bulle.textContent = recu;
-            journal.scrollTop = journal.scrollHeight;
+            machine.ajouter(evenement.delta); // affiche au fur et a mesure
           }
-          // evenement.done / evenement.usage : ignores ici (pas d'UI de tokens dans le widget)
+          // evenement.sources / done / usage : ignores ici (pas d'UI dediee dans le widget)
         }
       }
 
-      if (!recu.trim()) {
+      // On attend que la machine a ecrire ait affiche tout le texte recu.
+      await machine.finir();
+      if (!machine.texte().trim()) {
         bulle.textContent = "Le serveur a repondu, mais sans aucun texte.";
       }
     } catch (erreur) {
+      machine.stopper();
       bulle.classList.add("err");
       bulle.textContent = erreur.message + " (Verifie que ton serveur tourne et que CBC_ENDPOINT est correct.)";
     }

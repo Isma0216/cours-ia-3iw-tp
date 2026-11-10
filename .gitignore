@@ -13,3 +13,6 @@ node_modules/
 # Systeme
 .DS_Store
 *:Zone.Identifier
+
+# Contient un secret (token Notion) : jamais dans le depot
+app/front/statut.php
