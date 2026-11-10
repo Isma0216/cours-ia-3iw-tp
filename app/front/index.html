@@ -23,10 +23,13 @@
   .cbc-toggle:focus-visible{outline:3px solid var(--blue-bright);outline-offset:3px}
   .cbc-toggle svg{width:28px;height:28px}
   .cbc-toggle .cbc-x{display:none}
-  .cbc-chat.open .cbc-toggle .cbc-bubble{display:none}
-  .cbc-chat.open .cbc-toggle .cbc-x{display:block}
-  /* Panneau */
-  .cbc-panel{position:absolute;right:0;bottom:74px;width:min(380px,92vw);height:min(560px,72vh);
+  /* Le bouton du chatbot ouvert passe en croix */
+  .cbc-toggle.actif .cbc-bubble{display:none}
+  .cbc-toggle.actif .cbc-x{display:block}
+  /* Les trois boutons empiles : Lexique, Coach video, Assistant du club (en bas) */
+  .cbc-boutons{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+  /* Panneau : ouvert au-dessus de la pile (3 x 60 px de boutons + 2 x 12 px + 14 px d'air) */
+  .cbc-panel{position:absolute;right:0;bottom:218px;width:min(380px,92vw);height:min(540px,calc(100vh - 250px));
     display:flex;flex-direction:column;overflow:hidden;
     background:var(--surface);border:1px solid var(--line);border-radius:16px;
     box-shadow:0 24px 60px rgba(0,0,0,.55);animation:cbcUp .18s ease}
@@ -62,6 +65,46 @@
     font-size:.7rem;font-weight:600;color:var(--muted);background:transparent;
     border:1px solid var(--line);border-radius:20px;padding:6px 11px;cursor:pointer;transition:.15s}
   .cbc-suggests button:hover{border-color:var(--blue-bright);color:var(--text)}
+  /* Choix de discipline du Coach video (bouton enfonce = discipline choisie) */
+  .cbc-suggests button[aria-pressed="true"]{border-color:var(--red);color:var(--text);background:rgba(224,32,45,.14)}
+  .cbc-suggests[hidden],.cbc-log[hidden]{display:none}
+  /* Cartes video : les liens viennent du serveur (fichier JSON), jamais du modele */
+  .cbc-videos{align-self:stretch;display:flex;flex-direction:column;gap:8px}
+  .cbc-video{background:var(--bg);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:10px;padding:9px 11px}
+  .cbc-video strong{display:block;font-family:var(--util);text-transform:uppercase;letter-spacing:.04em;font-size:.82rem}
+  .cbc-video small{display:block;color:var(--muted);font-size:.7rem;margin-bottom:5px}
+  .cbc-video a{display:flex;gap:6px;align-items:baseline;color:var(--blue-bright);font-size:.8rem;line-height:1.35;
+    text-decoration:none;padding:3px 0}
+  .cbc-video a:hover{text-decoration:underline}
+  /* Bouton "Passer en ..." quand la question concerne une autre discipline */
+  .cbc-redirect{align-self:flex-start;font-family:var(--util);text-transform:uppercase;letter-spacing:.05em;
+    font-size:.76rem;font-weight:700;color:#fff;background:var(--red);border:none;border-radius:20px;
+    padding:8px 14px;cursor:pointer;transition:background .2s}
+  .cbc-redirect:hover:not(:disabled){background:var(--red-bright)}
+  .cbc-redirect:disabled{background:var(--line);cursor:default}
+  /* Bouton "S'inscrire au club" (lien Tally, decide par le serveur) */
+  .cbc-action{align-self:flex-start;display:inline-block;font-family:var(--util);text-transform:uppercase;
+    letter-spacing:.05em;font-size:.76rem;font-weight:700;color:#fff;background:var(--red);border-radius:20px;
+    padding:8px 14px;text-decoration:none;transition:background .2s}
+  .cbc-action:hover{background:var(--red-bright)}
+  /* Cartes cours ("Quel cours pour moi ?") : horaires et tarifs EXACTS, venus du serveur */
+  .cbc-cours span{display:block;font-size:.8rem;color:var(--text);line-height:1.45}
+  .cbc-cours .cbc-tarif{color:var(--muted);font-size:.74rem;margin-top:3px}
+  /* Choix du parcours guide (dans le journal) */
+  .cbc-choix{align-self:flex-start;display:flex;flex-wrap:wrap;gap:6px;max-width:95%}
+  .cbc-choix button{font-family:var(--util);text-transform:uppercase;letter-spacing:.04em;font-size:.7rem;
+    font-weight:600;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:20px;
+    padding:6px 11px;cursor:pointer;transition:.15s}
+  .cbc-choix button:hover:not(:disabled){border-color:var(--blue-bright)}
+  .cbc-choix button[aria-pressed="true"]{border-color:var(--red);background:rgba(224,32,45,.14)}
+  .cbc-choix button:disabled{opacity:.45;cursor:default}
+  .cbc-choix .cbc-valider{background:var(--red);border-color:var(--red);color:#fff}
+  /* Pouces 👍 / 👎 sous les reponses */
+  .cbc-avis{align-self:flex-start;display:flex;align-items:center;gap:4px;color:var(--muted);font-size:.72rem;margin-top:-6px}
+  .cbc-avis button{background:none;border:1px solid transparent;border-radius:8px;cursor:pointer;font-size:.9rem;
+    padding:2px 5px;line-height:1;filter:grayscale(.4);transition:.15s}
+  .cbc-avis button:hover:not(:disabled){border-color:var(--line);filter:none}
+  .cbc-avis button:disabled{cursor:default}
   /* Saisie */
   .cbc-input{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--surface-2)}
   .cbc-input input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;
@@ -73,7 +116,7 @@
   .cbc-input button:disabled{background:var(--line);cursor:not-allowed}
   @media(max-width:480px){
     .cbc-chat{right:14px;bottom:14px}
-    .cbc-panel{bottom:70px;height:74vh}
+    .cbc-panel{bottom:212px;height:calc(100vh - 240px)}
   }
 </style>
 </head>
@@ -1029,31 +1072,75 @@
 
 <script src="script.js"></script>
 
-<!-- ===== Assistant IA (chatbot) : interface ===== -->
+<!-- ===== Assistants IA (chatbots) : interface ===== -->
 <div id="cbcChat" class="cbc-chat">
-  <button id="cbcToggle" class="cbc-toggle" aria-label="Ouvrir l'assistant du club" aria-expanded="false" aria-controls="cbcPanel">
-    <svg class="cbc-bubble" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3c5.5 0 10 3.6 10 8s-4.5 8-10 8a11 11 0 0 1-3-.4L4 21l1.3-3.6A7.4 7.4 0 0 1 2 11c0-4.4 4.5-8 10-8z"/></svg>
-    <svg class="cbc-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-  </button>
+  <!-- Trois chatbots, un bouton chacun. Un seul panneau ouvert a la fois. -->
+  <div class="cbc-boutons">
+    <!-- Lexique & regles (en haut) : icone livre -->
+    <button id="cbcToggleLexique" class="cbc-toggle" data-mode="lexique" title="Lexique & règles"
+            aria-label="Ouvrir le lexique et les règles" aria-expanded="false" aria-controls="cbcPanel">
+      <svg class="cbc-bubble" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/>
+        <path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>
+        <path d="M9 7.5h7M9 11h5"/>
+      </svg>
+      <svg class="cbc-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <!-- Coach video : icone ecran + triangle "play" -->
+    <button id="cbcToggleCoach" class="cbc-toggle" data-mode="coach" title="Coach vidéo"
+            aria-label="Ouvrir le coach vidéo" aria-expanded="false" aria-controls="cbcPanel">
+      <svg class="cbc-bubble" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2.5" y="5" width="19" height="14" rx="3"/>
+        <path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/>
+      </svg>
+      <svg class="cbc-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <!-- Assistant du club (en bas) : icone bulle -->
+    <button id="cbcToggle" class="cbc-toggle" data-mode="club" title="Assistant du club"
+            aria-label="Ouvrir l'assistant du club" aria-expanded="false" aria-controls="cbcPanel">
+      <svg class="cbc-bubble" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3c5.5 0 10 3.6 10 8s-4.5 8-10 8a11 11 0 0 1-3-.4L4 21l1.3-3.6A7.4 7.4 0 0 1 2 11c0-4.4 4.5-8 10-8z"/></svg>
+      <svg class="cbc-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
 
-  <div id="cbcPanel" class="cbc-panel" role="dialog" aria-label="Assistant du Chatillon Boxing Club" hidden>
+  <div id="cbcPanel" class="cbc-panel" role="dialog" aria-labelledby="cbcTitre" hidden>
     <div class="cbc-head">
       <div class="cbc-head-id">
         <span class="cbc-dot" aria-hidden="true"></span>
         <div>
-          <strong>Assistant du club</strong>
-          <small>Reponses indicatives &middot; a confirmer au secretariat</small>
+          <strong id="cbcTitre">Assistant du club</strong>
+          <small id="cbcSousTitre">Reponses indicatives &middot; a confirmer au secretariat</small>
         </div>
       </div>
-      <button class="cbc-close" id="cbcClose" aria-label="Fermer l'assistant">&#10005;</button>
+      <button class="cbc-close" id="cbcClose" aria-label="Fermer">&#10005;</button>
     </div>
 
+    <!-- Un historique par chatbot : les conversations ne se melangent pas -->
     <div class="cbc-log" id="cbcLog" aria-live="polite"></div>
+    <div class="cbc-log" id="cbcLogCoach" aria-live="polite" hidden></div>
+    <div class="cbc-log" id="cbcLogLexique" aria-live="polite" hidden></div>
 
+    <!-- Assistant du club : suggestions + parcours guide -->
     <div class="cbc-suggests" id="cbcSuggests">
+      <button type="button" data-action="orientation">🧭 Quel cours pour moi ?</button>
       <button type="button">Quels sont les horaires du Muay Thaï ?</button>
       <button type="button">Combien coûte le MMA ?</button>
       <button type="button">Comment s'inscrire ?</button>
+    </div>
+
+    <!-- Coach video : choix de la discipline (envoye avec la demande) -->
+    <div class="cbc-suggests" id="cbcDisciplines" role="group" aria-label="Discipline" hidden>
+      <button type="button" data-discipline="toutes" aria-pressed="true">Toutes</button>
+      <button type="button" data-discipline="muay-thai" aria-pressed="false">Muay Thaï</button>
+      <button type="button" data-discipline="kick-boxing" aria-pressed="false">Kick-boxing</button>
+      <button type="button" data-discipline="mma" aria-pressed="false">MMA</button>
+    </div>
+
+    <!-- Lexique & regles : suggestions -->
+    <div class="cbc-suggests" id="cbcSuggestsLexique" hidden>
+      <button type="button">C'est quoi un teep ?</button>
+      <button type="button">Les coudes sont autorisés en kick-boxing ?</button>
+      <button type="button">Comment on gagne un combat ?</button>
     </div>
 
     <form class="cbc-input" id="cbcForm" autocomplete="off">
@@ -1067,53 +1154,134 @@
 (function () {
   "use strict";
 
-  // ============================================================
-  //  CONFIG : la route de TON serveur FastAPI a appeler.
-  //  - Meme origine (front servi par FastAPI)  -> "/api/assistant"
-  //  - Serveur separe (site PHP + API a part)   -> URL complete,
-  //    ex : "http://localhost:8000/api/assistant"
-  // ============================================================
-  var CBC_ENDPOINT = "/api/documents";
-
-  // Construit le corps JSON envoye a la route (contrat, Route 3).
-  function corpsRequete(message) {
-    return { question: message };
-  }
+  // Le widget n'appelle QUE les routes du serveur Node (meme origine),
+  // jamais Ollama directement (contrat, regle commune).
 
   // ---- References DOM ----
-  var chat     = document.getElementById("cbcChat");
-  var toggle   = document.getElementById("cbcToggle");
-  var fermer   = document.getElementById("cbcClose");
-  var panneau  = document.getElementById("cbcPanel");
-  var journal  = document.getElementById("cbcLog");
-  var form     = document.getElementById("cbcForm");
-  var champ    = document.getElementById("cbcText");
-  var envoi    = document.getElementById("cbcSend");
-  var suggests = document.getElementById("cbcSuggests");
-  var accueilAffiche = false;
+  var fermer      = document.getElementById("cbcClose");
+  var panneau     = document.getElementById("cbcPanel");
+  var form        = document.getElementById("cbcForm");
+  var champ       = document.getElementById("cbcText");
+  var envoi       = document.getElementById("cbcSend");
+  var titre       = document.getElementById("cbcTitre");
+  var sousTitre   = document.getElementById("cbcSousTitre");
+  var suggests    = document.getElementById("cbcSuggests");
+  var disciplines = document.getElementById("cbcDisciplines");
+  var suggestsLex = document.getElementById("cbcSuggestsLexique");
+  var boutons     = document.querySelectorAll(".cbc-toggle");   // un bouton par chatbot
 
-  // ---- Ouverture / fermeture ----
-  function ouvrir() {
-    chat.classList.add("open");
-    panneau.hidden = false;
-    toggle.setAttribute("aria-expanded", "true");
-    if (!accueilAffiche) {
-      ajouterMessage("bot", "Salut ! Pose-moi une question sur le club : horaires, tarifs, coachs, inscription...");
-      accueilAffiche = true;
+  // Formats de liens acceptes (revalides ici meme si le serveur les a deja filtres)
+  var LIEN_YOUTUBE     = /^https:\/\/www\.youtube\.com\/(watch\?v=[\w-]{11}|results\?search_query=[\w%+.-]+)$/;
+  var LIEN_INSCRIPTION = /^https:\/\/tally\.so\/r\/[\w-]+$/;
+
+  // ============================================================
+  //  Les trois chatbots. Chacun a sa route, son journal, son accueil
+  //  et sa facon de construire le corps de la requete. Le reste du code
+  //  (envoi, lecture SSE, affichage) est commun.
+  // ============================================================
+  var disciplineChoisie = "toutes";
+  var historiqueClub = [];          // memoire de l'Assistant du club : 3 derniers echanges
+  var MODES = {
+    club: {
+      chatbot: "club",
+      endpoint: "/api/documents",                       // contrat, Route 3
+      journal: document.getElementById("cbcLog"),
+      zoneChoix: suggests,
+      titre: "Assistant du club",
+      accueil: "Salut ! Pose-moi une question sur le club : horaires, tarifs, coachs, inscription... Ou clique sur « Quel cours pour moi ? ».",
+      placeholder: "Pose ta question sur le club...",
+      sousTitre: "Reponses indicatives · a confirmer au secretariat",
+      memoire: true,
+      corps: function (message) { return { question: message, historique: historiqueClub.slice(-3) }; },
+    },
+    coach: {
+      chatbot: "coach",
+      endpoint: "/api/combattants",                     // extension Coach video
+      journal: document.getElementById("cbcLogCoach"),
+      zoneChoix: disciplines,
+      titre: "Coach vidéo",
+      accueil: "Salut ! Choisis ta discipline, puis dis-moi ce que tu veux travailler (low kicks, défense, cardio, lutte...). Je te conseille des combattants à regarder sur YouTube.",
+      placeholder: "Qu'est-ce que tu veux travailler ?",
+      sousTitre: "Combattants a regarder · liens YouTube",
+      corps: function (message) { return { discipline: disciplineChoisie, objectif: message }; },
+    },
+    lexique: {
+      chatbot: "lexique",
+      endpoint: "/api/lexique",                         // extension Lexique & regles
+      journal: document.getElementById("cbcLogLexique"),
+      zoneChoix: suggestsLex,
+      titre: "Lexique & règles",
+      accueil: "Salut ! Un mot que tu ne comprends pas (teep, clinch, sprawl...) ou une règle à vérifier ? Demande-moi !",
+      placeholder: "Un mot, une règle...",
+      sousTitre: "Vocabulaire et regles · a confirmer avec ton coach",
+      corps: function (message) { return { question: message }; },
+    },
+  };
+  var modeActif = "club";
+  var journal = MODES.club.journal; // journal visible (utilise par l'affichage)
+  var accueilsAffiches = {};
+  var enCours = false;              // une reponse est en train de s'ecrire
+
+  // ---- Changement de chatbot ----
+  function afficherAccueil() {
+    if (!accueilsAffiches[modeActif]) {
+      ajouterMessage("bot", MODES[modeActif].accueil);
+      accueilsAffiches[modeActif] = true;
     }
+  }
+  function changerMode(mode) {
+    modeActif = mode;
+    journal = MODES[mode].journal;
+    Object.keys(MODES).forEach(function (m) {
+      MODES[m].journal.hidden = (m !== mode);
+      MODES[m].zoneChoix.hidden = (m !== mode);
+    });
+    titre.textContent = MODES[mode].titre;
+    champ.placeholder = MODES[mode].placeholder;
+    sousTitre.textContent = MODES[mode].sousTitre;
+  }
+
+  // ---- Ouverture / fermeture : un seul panneau, partage par les chatbots ----
+  function marquerBoutons(modeOuvert) {
+    boutons.forEach(function (b) {
+      var actif = b.getAttribute("data-mode") === modeOuvert;
+      b.classList.toggle("actif", actif);                  // icone -> croix
+      b.setAttribute("aria-expanded", actif ? "true" : "false");
+    });
+  }
+  function ouvrir(mode) {
+    changerMode(mode);
+    panneau.hidden = false;
+    marquerBoutons(mode);
+    afficherAccueil();
     champ.focus();
   }
   function fermerPanneau() {
-    chat.classList.remove("open");
     panneau.hidden = true;
-    toggle.setAttribute("aria-expanded", "false");
+    marquerBoutons(null);
   }
-  toggle.addEventListener("click", function () {
-    panneau.hidden ? ouvrir() : fermerPanneau();
+  boutons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var mode = b.getAttribute("data-mode");
+      if (!panneau.hidden && mode === modeActif) return fermerPanneau(); // re-clic : ferme
+      if (enCours && mode !== modeActif) return;   // une reponse s'ecrit : on attend la fin
+      ouvrir(mode);
+    });
   });
   fermer.addEventListener("click", fermerPanneau);
 
-  // ---- Ajout d'une bulle dans le journal ----
+  // Choix de la discipline (Coach video) : un seul bouton enfonce a la fois
+  disciplines.querySelectorAll("button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      disciplineChoisie = b.getAttribute("data-discipline");
+      disciplines.querySelectorAll("button").forEach(function (x) {
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      champ.focus();
+    });
+  });
+
+  // ---- Bulles ----
   function ajouterMessage(role, texte) {
     var div = document.createElement("div");
     div.className = "cbc-msg " + role;
@@ -1122,41 +1290,71 @@
     journal.scrollTop = journal.scrollHeight;
     return div;
   }
+  function inserer(apres, element) {
+    apres.insertAdjacentElement("afterend", element);
+    journal.scrollTop = journal.scrollHeight;
+    return element;
+  }
 
-  // ---- Puces de suggestion ----
-  suggests.querySelectorAll("button").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var fill = b.getAttribute("data-fill");
-      if (fill) { champ.value = fill; champ.focus(); return; }
-      champ.value = b.textContent.replace(/\s+/g, " ").trim();
-      form.requestSubmit();
+  // ---- Suggestions (club et lexique) ----
+  [suggests, suggestsLex].forEach(function (zone) {
+    zone.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (enCours) return;
+        if (b.getAttribute("data-action") === "orientation") return lancerOrientation();
+        champ.value = b.textContent.replace(/\s+/g, " ").trim();
+        form.requestSubmit();
+      });
     });
   });
 
-  // ---- Envoi + lecture du flux SSE ----
+  // ---- Saisie libre ----
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var message = champ.value.trim();
-    if (!message) return;
-
-    ajouterMessage("user", message);
+    if (!message || enCours) return;
     champ.value = "";
-    champ.disabled = true;
-    envoi.disabled = true;
-
-    var bulle = ajouterMessage("bot", "");
-    afficherReflexion(bulle);
-
-    envoyer(message, bulle).finally(function () {
-      bulle.classList.remove("cbc-cursor");
-      champ.disabled = false;
-      envoi.disabled = false;
-      champ.focus();
+    var mode = MODES[modeActif];
+    poser({
+      endpoint: mode.endpoint, corps: mode.corps(message), question: message,
+      chatbot: mode.chatbot, memoire: mode.memoire, afficherQuestion: true,
     });
   });
 
-  // Reproduit la logique de lecture SSE du front du TP :
-  // le serveur renvoie des lignes "data: {json}\n\n" avec delta / done / usage.
+  // ============================================================
+  //  Envoi d'une demande, commun a tous les chatbots
+  // ============================================================
+  function verrouiller(oui) {
+    enCours = oui;
+    champ.disabled = oui;
+    envoi.disabled = oui;
+  }
+  function figerChoixOuverts() {
+    journal.querySelectorAll(".cbc-choix button:not(:disabled)").forEach(function (b) { b.disabled = true; });
+  }
+
+  function poser(d) {
+    if (d.afficherQuestion) ajouterMessage("user", d.question);
+    figerChoixOuverts();             // une nouvelle demande abandonne un parcours en cours
+    verrouiller(true);
+    var bulle = ajouterMessage("bot", "");
+    afficherReflexion(bulle);
+
+    envoyer(d.endpoint, d.corps, bulle, d.question).then(function (r) {
+      if (!r.ok) return;
+      // Memoire (Assistant du club) : on garde les 3 derniers echanges
+      if (d.memoire) {
+        historiqueClub.push({ question: d.question.slice(0, 1000), reponse: r.texte.slice(0, 1500) });
+        if (historiqueClub.length > 3) historiqueClub.shift();
+      }
+      afficherAvis(r.dernier, d.chatbot, d.question, r.texte);
+    }).finally(function () {
+      bulle.classList.remove("cbc-cursor");
+      verrouiller(false);
+      champ.focus();
+    });
+  }
+
   // ---- "L'assistant reflechit" : affiche jusqu'au premier mot ----
   function afficherReflexion(bulle) {
     bulle.innerHTML = '<span class="cbc-dots" aria-label="L\'assistant reflechit"><i></i><i></i><i></i></span>';
@@ -1199,14 +1397,12 @@
         }
         enAttente += texte;
       },
-      // Attend que tout le texte recu soit affiche.
-      finir: function () {
+      finir: function () {                 // attend que tout le texte recu soit affiche
         fini = true;
         if (!demarre) terminer();
         return termine;
       },
-      // En cas d'erreur : on coupe tout de suite.
-      stopper: function () {
+      stopper: function () {               // en cas d'erreur : on coupe tout de suite
         clearInterval(minuteur);
         terminer();
       },
@@ -1214,13 +1410,142 @@
     };
   }
 
-  async function envoyer(message, bulle) {
+  // ============================================================
+  //  Elements affiches sous la reponse. Tout ce qui vient du serveur
+  //  est construit avec createElement / textContent : aucun HTML injecte.
+  //  Chaque fonction renvoie le dernier element insere (pour enchainer).
+  // ============================================================
+
+  // Cartes video (Coach video)
+  function afficherVideos(apres, videos) {
+    if (!videos || !videos.length) return apres;
+    var bloc = document.createElement("div");
+    bloc.className = "cbc-videos";
+    videos.forEach(function (v) {
+      var carte = document.createElement("div");
+      carte.className = "cbc-video";
+      var nom = document.createElement("strong");
+      nom.textContent = v.nom;
+      var disc = document.createElement("small");
+      disc.textContent = (v.disciplines || []).join(" · ");
+      carte.appendChild(nom);
+      carte.appendChild(disc);
+      (v.liens || []).forEach(function (l) {
+        if (!LIEN_YOUTUBE.test(l.url)) return;            // lien suspect : ignore
+        var a = document.createElement("a");
+        a.href = l.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = (l.type === "video" ? "▶ " : "🔎 ") + l.titre;
+        carte.appendChild(a);
+      });
+      bloc.appendChild(carte);
+    });
+    return inserer(apres, bloc);
+  }
+
+  // Cartes cours ("Quel cours pour moi ?") : horaires et tarifs exacts
+  function afficherCours(apres, cours) {
+    if (!cours || !cours.length) return apres;
+    var bloc = document.createElement("div");
+    bloc.className = "cbc-videos";
+    cours.forEach(function (c) {
+      var carte = document.createElement("div");
+      carte.className = "cbc-video cbc-cours";
+      var nom = document.createElement("strong");
+      nom.textContent = c.nom;
+      carte.appendChild(nom);
+      (c.creneaux || []).forEach(function (cr) {
+        var ligne = document.createElement("span");
+        ligne.textContent = "📅 " + cr.jour + " · " + cr.horaire;
+        carte.appendChild(ligne);
+      });
+      var tarif = document.createElement("span");
+      tarif.className = "cbc-tarif";
+      tarif.textContent = "💶 " + c.tarif;
+      carte.appendChild(tarif);
+      bloc.appendChild(carte);
+    });
+    return inserer(apres, bloc);
+  }
+
+  // Bouton "S'inscrire au club" (decide par le serveur, lien Tally verifie)
+  function afficherActions(apres, actions) {
+    var action = (actions || []).filter(function (a) {
+      return a.type === "inscription" && LIEN_INSCRIPTION.test(a.url);
+    })[0];
+    if (!action) return apres;
+    var lien = document.createElement("a");
+    lien.className = "cbc-action";
+    lien.href = action.url;
+    lien.target = "_blank";
+    lien.rel = "noopener noreferrer";
+    lien.textContent = "S'inscrire au club →";
+    return inserer(apres, lien);
+  }
+
+  // Bouton "Passer en ..." (Coach video, mauvaise discipline)
+  function afficherRedirection(apres, redirection, message) {
+    if (!redirection) return apres;
+    var choix = disciplines.querySelector('[data-discipline="' + redirection.discipline + '"]');
+    if (!choix) return apres;
+    var bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.className = "cbc-redirect";
+    bouton.textContent = "Passer en " + redirection.libelle + " →";
+    bouton.addEventListener("click", function () {
+      if (enCours) return;
+      bouton.disabled = true;
+      choix.click();                                     // selectionne la bonne discipline
+      champ.value = message;
+      form.requestSubmit();                              // et repose la meme question
+    });
+    return inserer(apres, bouton);
+  }
+
+  // Pouces 👍 / 👎 : un seul vote par reponse, enregistre via /api/avis
+  function afficherAvis(apres, chatbot, question, reponse) {
+    var zone = document.createElement("div");
+    zone.className = "cbc-avis";
+    var libelle = document.createElement("span");
+    libelle.textContent = "Utile ?";
+    zone.appendChild(libelle);
+    [["+", "👍", "Réponse utile"], ["-", "👎", "Réponse pas utile"]].forEach(function (v) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = v[1];
+      b.setAttribute("aria-label", v[2]);
+      b.addEventListener("click", function () {
+        zone.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+        fetch("/api/avis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatbot: chatbot, avis: v[0],
+            question: question.slice(0, 1000), reponse: reponse.slice(0, 4000),
+          }),
+        }).then(function (r) {
+          zone.textContent = r.ok ? "Merci pour ton avis !" : "Avis non enregistré.";
+        }).catch(function () { zone.textContent = "Avis non enregistré."; });
+      });
+      zone.appendChild(b);
+    });
+    return inserer(apres, zone);
+  }
+
+  // ============================================================
+  //  Lecture du flux SSE : "data: {json}\n\n" avec delta / done / usage
+  //  et les evenements propres a chaque chatbot (sources, videos, cours,
+  //  actions, redirection). Renvoie { ok, texte, dernier }.
+  // ============================================================
+  async function envoyer(endpoint, corps, bulle, message) {
     var machine = creerMachine(bulle);
+    var videos = null, cours = null, actions = null, redirection = null;
     try {
-      var reponse = await fetch(CBC_ENDPOINT, {
+      var reponse = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(corpsRequete(message)),
+        body: JSON.stringify(corps),
       });
 
       // Une erreur arrive en JSON classique, jamais en SSE.
@@ -1244,24 +1569,121 @@
           if (!ligne) continue;
           var charge = ligne.slice(6).trim();
           if (!charge || charge === "[DONE]") continue;
-          var evenement = JSON.parse(charge);
-          if (evenement.delta) {
-            machine.ajouter(evenement.delta); // affiche au fur et a mesure
-          }
-          // evenement.sources / done / usage : ignores ici (pas d'UI dediee dans le widget)
+          var ev = JSON.parse(charge);
+          if (ev.delta) machine.ajouter(ev.delta);          // affiche au fur et a mesure
+          if (ev.videos) { videos = ev.videos; redirection = ev.redirection || null; }
+          if (ev.cours) cours = ev.cours;
+          if (ev.actions) actions = ev.actions;
+          // ev.sources / done / usage : non affiches dans le widget
         }
       }
 
       // On attend que la machine a ecrire ait affiche tout le texte recu.
       await machine.finir();
-      if (!machine.texte().trim()) {
+      var texte = machine.texte().trim();
+      if (!texte) {
         bulle.textContent = "Le serveur a repondu, mais sans aucun texte.";
+        return { ok: false };
       }
+      var dernier = bulle;
+      dernier = afficherCours(dernier, cours);
+      dernier = afficherVideos(dernier, videos);
+      dernier = afficherActions(dernier, actions);
+      dernier = afficherRedirection(dernier, redirection, message);
+      return { ok: true, texte: texte, dernier: dernier };
     } catch (erreur) {
       machine.stopper();
       bulle.classList.add("err");
-      bulle.textContent = erreur.message + " (Verifie que ton serveur tourne et que CBC_ENDPOINT est correct.)";
+      bulle.textContent = erreur.message + " (Verifie que le serveur tourne : make app-node.)";
+      return { ok: false };
     }
+  }
+
+  // ============================================================
+  //  "Quel cours pour moi ?" : parcours guide en 4 questions.
+  //  Les reponses sont des boutons (valeurs connues du serveur), puis le
+  //  profil part vers /api/orientation.
+  // ============================================================
+  var ETAPES = [
+    { cle: "age", question: "Quel âge a la personne qui veut s'inscrire ?",
+      choix: [["8-11", "8 à 11 ans"], ["12-15", "12 à 15 ans"], ["16-17", "16-17 ans"], ["adulte", "Adulte"]] },
+    { cle: "niveau", question: "Elle a déjà pratiqué un sport de combat ?",
+      choix: [["debutant", "Non, débutant"], ["deja", "Oui, déjà pratiqué"]] },
+    { cle: "objectif", question: "Quel est l'objectif principal ?",
+      choix: [["forme", "Forme / cardio"], ["defense", "Se défendre"], ["competition", "Compétition"], ["complet", "Sport complet (MMA)"]] },
+    { cle: "jours", multiple: true, question: "Quels jours sont possibles ? (plusieurs choix)",
+      choix: [["lundi", "Lundi"], ["mardi", "Mardi"], ["mercredi", "Mercredi"], ["jeudi", "Jeudi"], ["vendredi", "Vendredi"], ["samedi", "Samedi"]] },
+  ];
+
+  function lancerOrientation() {
+    if (enCours) return;
+    figerChoixOuverts();
+    ajouterMessage("user", "Quel cours pour moi ?");
+    var profil = {};
+    var resume = [];
+
+    function etape(i) {
+      if (i === ETAPES.length) {
+        return poser({
+          endpoint: "/api/orientation", corps: profil,
+          question: "Quel cours pour moi ? " + resume.join(" · "),
+          chatbot: "orientation", memoire: false, afficherQuestion: false,
+        });
+      }
+      var e = ETAPES[i];
+      ajouterMessage("bot", e.question);
+      var zone = document.createElement("div");
+      zone.className = "cbc-choix";
+      var choisis = [];
+      var valider = null;
+
+      e.choix.forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = c[1];
+        b.setAttribute("aria-pressed", "false");
+        b.addEventListener("click", function () {
+          if (e.multiple) {                              // choix multiple : on coche / decoche
+            var k = choisis.indexOf(c[0]);
+            if (k === -1) choisis.push(c[0]); else choisis.splice(k, 1);
+            b.setAttribute("aria-pressed", k === -1 ? "true" : "false");
+            valider.disabled = choisis.length === 0;
+            return;
+          }
+          zone.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          b.setAttribute("aria-pressed", "true");
+          ajouterMessage("user", c[1]);
+          profil[e.cle] = c[0];
+          resume.push(c[1]);
+          etape(i + 1);
+        });
+        zone.appendChild(b);
+      });
+
+      if (e.multiple) {
+        valider = document.createElement("button");
+        valider.type = "button";
+        valider.className = "cbc-valider";
+        valider.textContent = "Valider →";
+        valider.disabled = true;
+        valider.addEventListener("click", function () {
+          zone.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          // dans l'ordre de la semaine, quel que soit l'ordre des clics
+          var jours = e.choix.map(function (c) { return c[0]; })
+            .filter(function (j) { return choisis.indexOf(j) !== -1; });
+          var libelles = e.choix.filter(function (c) { return choisis.indexOf(c[0]) !== -1; })
+            .map(function (c) { return c[1]; });
+          ajouterMessage("user", libelles.join(", "));
+          profil[e.cle] = jours;
+          resume.push(libelles.join(", "));
+          etape(i + 1);
+        });
+        zone.appendChild(valider);
+      }
+      journal.appendChild(zone);
+      journal.scrollTop = journal.scrollHeight;
+    }
+    etape(0);
   }
 })();
 </script>

@@ -53,10 +53,18 @@ async function documents(req, res) {
     // Validation complementaire : levee AVANT le premier evenement, elle
     // devient un vrai 400 (le flux n'est pas encore ouvert).
     if (question.length > QUESTION_MAX) throw new RequeteInvalide("question invalide");
+    // Extension "memoire" (club_extras.mjs) : champ optionnel, valide lui aussi
+    // avant le premier evenement. Absent = comportement du contrat, inchange.
+    const historique = validerHistorique(corps.historique);
+
+    // Question de suite ("Et le samedi ?") -> question complete, grace a la
+    // conversation. Sans historique, aucun appel : la question est gardee.
+    const reformulation = await reformuler(question.trim(), historique);
+    const questionComplete = reformulation.question;
 
     // 1 a 3 : retrouver les 3 extraits les plus proches de la question
     const vecteurs = await indexer();
-    const [vecteurQuestion] = await plonger([question]);
+    const [vecteurQuestion] = await plonger([questionComplete]);
     const extraits = chercher(vecteurQuestion, vecteurs, 3);
 
     // 4 : les sources partent AVANT tout fragment, comme l'exige le contrat
@@ -69,9 +77,14 @@ async function documents(req, res) {
     if (!extraits.length || extraits[0].score < SEUIL) {
       console.log(`[documents] modele=aucun entree=0 sortie=0 ms=${Math.round(performance.now() - debut)} issue=refus_seuil`);
       yield fragment(REFUS);
-      yield fin({}, debut);
+      yield fin(reformulation.usage, debut);
       return;
     }
+
+    // Extension : bouton "S'inscrire" si on parle de tarifs ou d'inscription.
+    // Decide par le code ; envoye avant le texte, comme les sources.
+    const actions = actionsInscription(questionComplete, extraits);
+    if (actions.length) yield sse({ actions });
 
     // 5 : la consigne (system) est separee des donnees (user). Les extraits et
     // la question sont des DONNEES, jamais des consignes.
@@ -99,7 +112,7 @@ async function documents(req, res) {
       },
       {
         role: "user",
-        content: `<infos_club>\n${contexte}\n</infos_club>\n\nQuestion : ${question}`,
+        content: `<infos_club>\n${contexte}\n</infos_club>\n\nQuestion : ${questionComplete}`,
       },
     ];
 
@@ -115,7 +128,12 @@ async function documents(req, res) {
       issue = `echec: ${e.message}`;
       throw e;
     } finally {
-      console.log(`[documents] modele=${MODELE} entree=${usage.entree ?? 0} sortie=${usage.sortie ?? 0} ms=${Math.round(performance.now() - debut)} issue=${issue}`);
+      // Total des appels (reformulation eventuelle + redaction)
+      usage = {
+        entree: (usage.entree ?? 0) + reformulation.usage.entree,
+        sortie: (usage.sortie ?? 0) + reformulation.usage.sortie,
+      };
+      console.log(`[documents] modele=${MODELE} entree=${usage.entree} sortie=${usage.sortie} ms=${Math.round(performance.now() - debut)} issue=${issue}`);
     }
     yield fin(usage, debut);
   }
@@ -123,4 +141,15 @@ async function documents(req, res) {
   await fluxOu503(res, flux());
 }
 
-export const routes = { "POST /api/documents": documents };
+// ---------------------------------------------------------------------
+// Ajouts hors TODO (extensions) :
+// - club_extras.mjs : memoire de conversation et bouton "S'inscrire",
+//   utilises dans le TODO 12 ci-dessus ;
+// - extensions.mjs : main.mjs ne branche que les routes des fichiers de
+//   seance et ne doit pas etre modifie. Les routes d'extension (Coach video,
+//   orientation, avis, lexique) sont donc exposees a travers celle-ci.
+// ---------------------------------------------------------------------
+import { actionsInscription, reformuler, validerHistorique } from "./club_extras.mjs";
+import { routes as routesExtensions } from "./extensions.mjs";
+
+export const routes = { "POST /api/documents": documents, ...routesExtensions };

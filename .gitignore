@@ -16,3 +16,6 @@ node_modules/
 
 # Contient un secret (token Notion) : jamais dans le depot
 app/front/statut.php
+
+# Avis des visiteurs (questions posees) : jamais dans le depot
+app/donnees/avis/

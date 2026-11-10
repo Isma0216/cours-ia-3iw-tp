@@ -1,0 +1,165 @@
+{
+  "_lisez_moi": "Combattants conseilles par le Coach video. Les liens sont ecrits ici, JAMAIS par le modele. type=video : lien verifie vers une video precise ; type=recherche : recherche YouTube ciblee (ne casse jamais). disciplines : muay-thai, kick-boxing, mma.",
+  "combattants": [
+    {
+      "nom": "Buakaw Banchamek",
+      "disciplines": ["muay-thai", "kick-boxing"],
+      "style": "Combattant thaïlandais très complet, double champion du K-1 Max, réputé pour sa régularité et son physique.",
+      "points_forts": ["low kicks puissants", "middle kick et switch kick", "genoux", "clinch", "cardio et condition physique", "régularité technique"],
+      "videos": [
+        {"titre": "Buakaw vs Japanese Low Kick Expert (analyse de Gabriel Varga)", "url": "https://www.youtube.com/watch?v=YdSpXinCnJg", "type": "video"},
+        {"titre": "Recherche : Buakaw technique de low kick", "url": "https://www.youtube.com/results?search_query=Buakaw+low+kick+technique", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Saenchai",
+      "disciplines": ["muay-thai"],
+      "style": "Légende du Muay Thaï, très technique et créatif, il bat régulièrement des adversaires plus lourds.",
+      "points_forts": ["feintes", "jeu de jambes et déplacements", "équilibre", "balayages", "fausse attaque suivie d'un teep", "combattre un adversaire plus grand", "défense et esquives"],
+      "videos": [
+        {"titre": "Recherche : Saenchai analyse technique", "url": "https://www.youtube.com/results?search_query=Saenchai+technique+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Saenchai balayages", "url": "https://www.youtube.com/results?search_query=Saenchai+sweeps", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Rodtang Jitmuangnon",
+      "disciplines": ["muay-thai"],
+      "style": "Champion ONE surnommé « The Iron Man », style ultra agressif vers l'avant.",
+      "points_forts": ["pression constante", "coups de poing en avançant", "encaisser les coups", "mental et agressivité", "cardio", "combat au corps à corps"],
+      "videos": [
+        {"titre": "Recherche : Rodtang highlights ONE Championship", "url": "https://www.youtube.com/results?search_query=Rodtang+Jitmuangnon+highlights", "type": "recherche"},
+        {"titre": "Recherche : Rodtang analyse de style", "url": "https://www.youtube.com/results?search_query=Rodtang+style+breakdown", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Samart Payakaroon",
+      "disciplines": ["muay-thai"],
+      "style": "Légende du Muay Thaï des années 80, aussi champion de boxe anglaise, modèle de timing et d'élégance.",
+      "points_forts": ["timing", "boxe et précision des poings", "esquives et défense", "teep (coup de pied de face)", "gestion de la distance"],
+      "videos": [
+        {"titre": "Recherche : Samart Payakaroon technique", "url": "https://www.youtube.com/results?search_query=Samart+Payakaroon+technique", "type": "recherche"},
+        {"titre": "Recherche : Samart Payakaroon teep", "url": "https://www.youtube.com/results?search_query=Samart+Payakaroon+teep", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Superlek Kiatmoo9",
+      "disciplines": ["muay-thai", "kick-boxing"],
+      "style": "Champion ONE en Muay Thaï et en kick-boxing, réputé pour la qualité de ses coups de pied.",
+      "points_forts": ["middle kick", "coups de pied précis et puissants", "rythme et gestion du combat", "feintes de hanche", "low kicks"],
+      "videos": [
+        {"titre": "Recherche : Superlek kicks breakdown", "url": "https://www.youtube.com/results?search_query=Superlek+kicks+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Superlek highlights", "url": "https://www.youtube.com/results?search_query=Superlek+Kiatmoo9+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Giorgio Petrosyan",
+      "disciplines": ["kick-boxing"],
+      "style": "Kick-boxeur italien considéré comme l'un des plus grands techniciens de l'histoire, surnommé « The Doctor ».",
+      "points_forts": ["défense", "timing et contres", "précision", "gestion de la distance", "garde et calme", "lecture de l'adversaire"],
+      "videos": [
+        {"titre": "Recherche : Giorgio Petrosyan défense et timing", "url": "https://www.youtube.com/results?search_query=Giorgio+Petrosyan+defense+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Giorgio Petrosyan highlights", "url": "https://www.youtube.com/results?search_query=Giorgio+Petrosyan+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Ernesto Hoost",
+      "disciplines": ["kick-boxing"],
+      "style": "Quadruple champion du K-1 World Grand Prix, symbole du kick-boxing à la hollandaise.",
+      "points_forts": ["combinaisons poings puis low kick", "enchaînements bras-jambes", "technique propre", "low kicks", "finir une combinaison"],
+      "videos": [
+        {"titre": "Recherche : Ernesto Hoost combinaisons", "url": "https://www.youtube.com/results?search_query=Ernesto+Hoost+combinations", "type": "recherche"},
+        {"titre": "Recherche : Ernesto Hoost K-1 highlights", "url": "https://www.youtube.com/results?search_query=Ernesto+Hoost+K-1+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Rico Verhoeven",
+      "disciplines": ["kick-boxing"],
+      "style": "Champion poids lourd de Glory pendant de longues années, très complet et très endurant.",
+      "points_forts": ["cardio et endurance", "pression", "jab", "gestion d'un combat long", "physique de poids lourd"],
+      "videos": [
+        {"titre": "Recherche : Rico Verhoeven highlights", "url": "https://www.youtube.com/results?search_query=Rico+Verhoeven+highlights", "type": "recherche"},
+        {"titre": "Recherche : Rico Verhoeven entraînement", "url": "https://www.youtube.com/results?search_query=Rico+Verhoeven+training", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Superbon Singha Mawynn",
+      "disciplines": ["kick-boxing", "muay-thai"],
+      "style": "Champion ONE de kick-boxing, réputé pour la technique de ses coups de pied et son contre du teep.",
+      "points_forts": ["middle kick", "high kick", "contre du teep", "coups de pied techniques", "patience"],
+      "videos": [
+        {"titre": "Recherche : Superbon technique de kick", "url": "https://www.youtube.com/results?search_query=Superbon+kick+technique", "type": "recherche"},
+        {"titre": "Recherche : Superbon highlights", "url": "https://www.youtube.com/results?search_query=Superbon+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Cédric Doumbè",
+      "disciplines": ["kick-boxing", "mma"],
+      "style": "Français, ancien champion Glory de kick-boxing passé au MMA, très rapide et très mobile.",
+      "points_forts": ["vitesse", "jeu de jambes et mobilité", "contres", "esquives", "gestion de la distance", "confiance en soi"],
+      "videos": [
+        {"titre": "Recherche : Cédric Doumbè highlights kick-boxing", "url": "https://www.youtube.com/results?search_query=Cedric+Doumbe+kickboxing+highlights", "type": "recherche"},
+        {"titre": "Recherche : Cédric Doumbè analyse", "url": "https://www.youtube.com/results?search_query=Cedric+Doumbe+breakdown", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Georges St-Pierre",
+      "disciplines": ["mma"],
+      "style": "Légende canadienne de l'UFC, champion dans deux catégories, modèle de MMA complet et intelligent.",
+      "points_forts": ["jab", "feintes", "amener l'adversaire au sol (takedown, double leg)", "lutte", "grappling et corps à corps au sol", "enchaîner frappe et amenée au sol", "contrôle au sol", "cardio", "stratégie"],
+      "videos": [
+        {"titre": "Recherche : GSP takedowns breakdown", "url": "https://www.youtube.com/results?search_query=Georges+St-Pierre+takedown+breakdown", "type": "recherche"},
+        {"titre": "Recherche : GSP jab et feintes", "url": "https://www.youtube.com/results?search_query=Georges+St-Pierre+jab+feints", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Khabib Nurmagomedov",
+      "disciplines": ["mma"],
+      "style": "Champion invaincu de l'UFC, dominant grâce à sa lutte et à son contrôle.",
+      "points_forts": ["lutte", "grappling et corps à corps au sol", "amener l'adversaire au sol (takedown)", "contrôle au sol", "pression contre la cage", "frappes au sol (ground and pound)", "cardio", "mental"],
+      "videos": [
+        {"titre": "Recherche : Khabib lutte et contrôle", "url": "https://www.youtube.com/results?search_query=Khabib+wrestling+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Khabib highlights", "url": "https://www.youtube.com/results?search_query=Khabib+Nurmagomedov+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Israel Adesanya",
+      "disciplines": ["mma", "kick-boxing"],
+      "style": "Ancien kick-boxeur devenu champion UFC, référence du striking en MMA.",
+      "points_forts": ["striking", "gestion de la distance", "feintes", "contres", "jeu de jambes", "coups de pied"],
+      "videos": [
+        {"titre": "Recherche : Israel Adesanya striking breakdown", "url": "https://www.youtube.com/results?search_query=Israel+Adesanya+striking+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Israel Adesanya highlights", "url": "https://www.youtube.com/results?search_query=Israel+Adesanya+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Ciryl Gane",
+      "disciplines": ["mma", "muay-thai"],
+      "style": "Français, poids lourd UFC venu du Muay Thaï, très mobile pour sa catégorie.",
+      "points_forts": ["jeu de jambes", "mobilité", "coups de pied", "striking venu du Muay Thaï", "gestion de la distance"],
+      "videos": [
+        {"titre": "Recherche : Ciryl Gane footwork", "url": "https://www.youtube.com/results?search_query=Ciryl+Gane+footwork+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Ciryl Gane highlights", "url": "https://www.youtube.com/results?search_query=Ciryl+Gane+highlights", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Benoît Saint-Denis",
+      "disciplines": ["mma"],
+      "style": "Français de l'UFC, style très offensif et endurant, à l'aise debout comme au sol.",
+      "points_forts": ["pression", "soumissions", "grappling et corps à corps au sol", "lutte", "cardio", "agressivité", "transitions vers le sol"],
+      "videos": [
+        {"titre": "Recherche : Benoît Saint-Denis highlights", "url": "https://www.youtube.com/results?search_query=Benoit+Saint-Denis+highlights", "type": "recherche"},
+        {"titre": "Recherche : Benoît Saint-Denis soumissions", "url": "https://www.youtube.com/results?search_query=Benoit+Saint-Denis+submission", "type": "recherche"}
+      ]
+    },
+    {
+      "nom": "Demetrious Johnson",
+      "disciplines": ["mma"],
+      "style": "Ancien champion UFC des poids mouches, considéré comme l'un des combattants les plus complets.",
+      "points_forts": ["transitions entre frappe et lutte", "grappling et contrôle au sol", "cardio", "polyvalence", "vitesse", "contrôle", "intelligence de combat"],
+      "videos": [
+        {"titre": "Recherche : Demetrious Johnson breakdown", "url": "https://www.youtube.com/results?search_query=Demetrious+Johnson+breakdown", "type": "recherche"},
+        {"titre": "Recherche : Demetrious Johnson highlights", "url": "https://www.youtube.com/results?search_query=Demetrious+Johnson+highlights", "type": "recherche"}
+      ]
+    }
+  ]
+}

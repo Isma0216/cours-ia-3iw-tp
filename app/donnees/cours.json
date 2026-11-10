@@ -1,0 +1,78 @@
+{
+  "_lisez_moi": "Cours du club, sous forme structuree, pour le parcours 'Quel cours pour moi ?'. Source : les fiches club-*.md (planning, disciplines, tarifs). Le filtrage age/jours est fait par le CODE, jamais par le modele. ages = [min, max] inclus ; un creneau peut avoir ses propres ages.",
+  "cours": [
+    {
+      "id": "kids-ados",
+      "nom": "Kids / Ados",
+      "ages": [8, 17],
+      "objectifs": ["forme", "defense", "competition"],
+      "description": "Initiation aux boxes pieds-poings (kick-boxing, Muay Thaï) et à la boxe anglaise, dans un cadre sécurisé et ludique.",
+      "creneaux": [
+        {"jour": "mercredi", "horaire": "17h30 – 18h45", "ages": [8, 17]},
+        {"jour": "vendredi", "horaire": "18h – 19h", "ages": [12, 17]}
+      ],
+      "tarif": "Kids 200 € par an, Ados 230 € par an (hors commune +20 €)"
+    },
+    {
+      "id": "mma-enfant",
+      "nom": "MMA Enfant",
+      "ages": [8, 15],
+      "objectifs": ["complet", "defense", "competition"],
+      "description": "Initiation au MMA (percussion en contrôle et lutte au sol), en toute sécurité et de façon ludique.",
+      "creneaux": [
+        {"jour": "mardi", "horaire": "18h – 19h"},
+        {"jour": "jeudi", "horaire": "18h – 19h"}
+      ],
+      "tarif": "270 € par an (hors commune 290 €)"
+    },
+    {
+      "id": "cardio-boxing",
+      "nom": "Cardio Boxing",
+      "ages": [15, 99],
+      "objectifs": ["forme"],
+      "description": "Le kick-boxing en version tonique et accessible : cardio, renforcement, coordination et confiance en soi. Débutantes bienvenues.",
+      "creneaux": [
+        {"jour": "samedi", "horaire": "10h15 – 12h15"}
+      ],
+      "tarif": "230 € par an (hors commune 250 €)"
+    },
+    {
+      "id": "kick-boxing",
+      "nom": "Kick-boxing",
+      "ages": [18, 99],
+      "objectifs": ["forme", "defense", "competition"],
+      "description": "Sport pieds-poings complet : enchaînements bras-jambes, endurance, explosivité.",
+      "creneaux": [
+        {"jour": "lundi", "horaire": "19h30 – 21h"},
+        {"jour": "mercredi", "horaire": "19h30 – 21h"}
+      ],
+      "tarif": "320 € par an, étudiant 270 € (hors commune +20 €)"
+    },
+    {
+      "id": "muay-thai",
+      "nom": "Muay Thaï",
+      "ages": [18, 99],
+      "objectifs": ["defense", "competition", "forme"],
+      "description": "L'art des huit membres : poings, pieds, genoux et coudes. Puissance, résistance et maîtrise de soi.",
+      "creneaux": [
+        {"jour": "mardi", "horaire": "20h15 – 21h45"},
+        {"jour": "jeudi", "horaire": "20h15 – 21h45"}
+      ],
+      "tarif": "320 € par an, étudiant 270 € (hors commune +20 €)"
+    },
+    {
+      "id": "mma",
+      "nom": "MMA",
+      "ages": [18, 99],
+      "objectifs": ["complet", "defense", "competition"],
+      "description": "Arts martiaux mixtes : frappes debout, lutte, travail au sol et soumissions. La discipline la plus complète.",
+      "creneaux": [
+        {"jour": "lundi", "horaire": "18h30 – 19h30"},
+        {"jour": "mardi", "horaire": "19h15 – 20h15"},
+        {"jour": "jeudi", "horaire": "19h15 – 20h15"},
+        {"jour": "vendredi", "horaire": "19h15 – 20h15"}
+      ],
+      "tarif": "380 € par an, étudiant 330 € (hors commune +20 €)"
+    }
+  ]
+}
